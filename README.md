@@ -1,6 +1,6 @@
 # RuboCop RSpec Guide
 
-Custom RuboCop cops that enforce best practices from the [RSpec Style Guide](https://github.com/rspec-guide/rspec-guide).
+Custom RuboCop cops that enforce best practices from the [RSpec Style Guide](https://github.com/AlexeyMatskevich/rspec-guide).
 
 ## Installation
 
@@ -292,5 +292,5 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## References
 
-- [RSpec Style Guide](https://github.com/rspec-guide/rspec-guide)
+- [RSpec Style Guide](https://github.com/AlexeyMatskevich/rspec-guide)
 - [RuboCop RSpec](https://github.com/rubocop/rubocop-rspec)
