@@ -163,8 +163,18 @@ module RuboCop
           return true if node.sym_type? || node.str_type? || node.int_type? || node.float_type?
           return true if node.true_type? || node.false_type? || node.nil_type?
 
-          if node.array_type? || node.hash_type?
-            # Simple arrays and hashes with literal values
+          # Handle hash pair nodes (key-value pairs inside hashes)
+          if node.pair_type?
+            return simple_value?(node.key) && simple_value?(node.value)
+          end
+
+          if node.hash_type?
+            # Hash children are pair nodes
+            return node.children.all? { |child| simple_value?(child) }
+          end
+
+          if node.array_type?
+            # Array children can be any simple values
             return node.children.all? { |child| simple_value?(child) }
           end
 

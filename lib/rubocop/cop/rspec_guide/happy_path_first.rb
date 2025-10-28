@@ -50,7 +50,7 @@ module RuboCop
         # @!method context_with_description?(node)
         def_node_matcher :context_with_description?, <<~PATTERN
           (block
-            (send nil? :context (str $_description))
+            (send nil? :context (str $_description) ...)
             ...)
         PATTERN
 

@@ -4,7 +4,7 @@ require_relative "lib/rubocop/rspec/guide/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rubocop-rspec-guide"
-  spec.version = Rubocop::Rspec::Guide::VERSION
+  spec.version = RuboCop::RSpec::Guide::VERSION
   spec.authors = ["Alexey Matskevich"]
   spec.email = ["github_job@mackevich.addymail.com"]
 

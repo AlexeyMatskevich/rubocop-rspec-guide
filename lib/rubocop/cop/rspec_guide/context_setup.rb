@@ -37,7 +37,7 @@ module RuboCop
       #   end
       #
       class ContextSetup < Base
-        MSG = "Context should have setup (let/before) to distinguish it from parent context"
+        MSG = "Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context"
 
         # @!method context_block?(node)
         def_node_matcher :context_block?, <<~PATTERN
@@ -48,7 +48,7 @@ module RuboCop
 
         # @!method let_declaration?(node)
         def_node_matcher :let_declaration?, <<~PATTERN
-          (block (send nil? {:let :let!} ...) ...)
+          (block (send nil? {:let :let! :let_it_be :let_it_be!} ...) ...)
         PATTERN
 
         # @!method before_hook?(node)

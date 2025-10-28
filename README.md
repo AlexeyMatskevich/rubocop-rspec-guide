@@ -114,7 +114,7 @@ end
 
 ### RSpecGuide/ContextSetup
 
-Requires contexts to have setup (let/before) to distinguish them from parent.
+Requires contexts to have setup (let/let!/let_it_be/let_it_be!/before) to distinguish them from parent.
 
 **Note:** `subject` should be defined at `describe` level, not in contexts, as it describes the object under test. Use `RSpec/LeadingSubject` cop to ensure subject is defined first.
 
@@ -133,6 +133,12 @@ end
 # good - let defines context-specific state
 context 'when premium' do
   let(:user) { create(:user, :premium) }
+  it { expect(user).to have_access }
+end
+
+# good - let_it_be for performance (from test-prof/rspec-rails)
+context 'when premium' do
+  let_it_be(:user) { create(:user, :premium) }
   it { expect(user).to have_access }
 end
 

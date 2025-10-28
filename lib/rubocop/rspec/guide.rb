@@ -2,8 +2,8 @@
 
 require_relative "guide/version"
 
-module Rubocop
-  module Rspec
+module RuboCop
+  module RSpec
     module Guide
       class Error < StandardError; end
       # Your code goes here...

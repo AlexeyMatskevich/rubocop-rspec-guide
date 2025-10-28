@@ -184,6 +184,40 @@ RSpec.describe RuboCop::Cop::RSpecGuide::DuplicateLetValues, :config do
     RUBY
   end
 
+  it "handles hash values" do
+    expect_offense(<<~RUBY)
+      describe 'Calculator' do
+        context 'with addition' do
+          let(:config) { {timeout: 5} }
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/DuplicateLetValues: Duplicate `let(:config)` with same value `{timeout: 5}` in ALL sibling contexts. Extract to parent context.
+          it { expect(result).to eq(10) }
+        end
+
+        context 'with subtraction' do
+          let(:config) { {timeout: 5} }
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/DuplicateLetValues: Duplicate `let(:config)` with same value `{timeout: 5}` in ALL sibling contexts. Extract to parent context.
+          it { expect(result).to eq(5) }
+        end
+      end
+    RUBY
+  end
+
+  it "handles array values" do
+    expect_offense(<<~RUBY)
+      describe 'Processor' do
+        context 'with operation A' do
+          let(:options) { [:fast, :safe] }
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/DuplicateLetValues: Duplicate `let(:options)` with same value `[:fast, :safe]` in ALL sibling contexts. Extract to parent context.
+        end
+
+        context 'with operation B' do
+          let(:options) { [:fast, :safe] }
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/DuplicateLetValues: Duplicate `let(:options)` with same value `[:fast, :safe]` in ALL sibling contexts. Extract to parent context.
+        end
+      end
+    RUBY
+  end
+
   it "does not check nested contexts as siblings" do
     expect_no_offenses(<<~RUBY)
       describe 'Calculator' do

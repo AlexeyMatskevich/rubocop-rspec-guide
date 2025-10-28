@@ -72,6 +72,22 @@ RSpec.describe RuboCop::Cop::RSpecGuide::HappyPathFirst, :config do
         RUBY
       end
     end
+
+    context "with metadata/tags on context" do
+      it "registers an offense" do
+        expect_offense(<<~RUBY)
+          describe '#process' do
+            context 'but user is blocked', :aggregate_failures do
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/HappyPathFirst: Place happy path contexts before corner cases. First context appears to be a corner case: but user is blocked
+              it { expect(result).to be_nil }
+            end
+            context 'when user is valid' do
+              it { expect(result).to be_success }
+            end
+          end
+        RUBY
+      end
+    end
   end
 
   context "when happy path context appears first" do

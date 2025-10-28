@@ -14,7 +14,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::ContextSetup, :config do
         expect_offense(<<~RUBY)
           describe 'User' do
             context 'when premium' do
-            ^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/before) to distinguish it from parent context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context
               it 'has access' do
                 expect(user).to have_access
               end
@@ -29,7 +29,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::ContextSetup, :config do
         expect_offense(<<~RUBY)
           describe 'Calculator' do
             context 'with valid data' do
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/before) to distinguish it from parent context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context
               subject { Calculator.new(data) }
 
               it { is_expected.to be_valid }
@@ -44,7 +44,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::ContextSetup, :config do
         expect_offense(<<~RUBY)
           describe 'User' do
             context 'when active' do
-            ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/before) to distinguish it from parent context
+            ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context
               it 'can login' do
                 expect(user.can_login?).to be true
               end
@@ -66,7 +66,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::ContextSetup, :config do
               let(:user) { create(:user) }
 
               context 'and premium' do
-              ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/before) to distinguish it from parent context
+              ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/ContextSetup: Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context
                 it 'has access' do
                   expect(user).to have_access
                 end
@@ -117,6 +117,38 @@ RSpec.describe RuboCop::Cop::RSpecGuide::ContextSetup, :config do
           describe 'User' do
             context 'when premium' do
               before { user.upgrade_to_premium! }
+
+              it 'has access' do
+                expect(user).to have_access
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    context "with let_it_be" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          describe 'User' do
+            context 'when premium' do
+              let_it_be(:user) { create(:user, :premium) }
+
+              it 'has access' do
+                expect(user).to have_access
+              end
+            end
+          end
+        RUBY
+      end
+    end
+
+    context "with let_it_be!" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          describe 'User' do
+            context 'when premium' do
+              let_it_be!(:user) { create(:user, :premium) }
 
               it 'has access' do
                 expect(user).to have_access
