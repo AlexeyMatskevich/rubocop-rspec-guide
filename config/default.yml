@@ -1,0 +1,38 @@
+---
+RSpecGuide/CharacteristicsAndContexts:
+  Description: "Require at least 2 contexts in describe block (happy path + edge cases)"
+  Enabled: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+RSpecGuide/DuplicateLetValues:
+  Description: "Detect duplicate let values in sibling contexts (ERROR if in all, WARNING if partial)"
+  Enabled: true
+  WarnOnPartialDuplicates: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+RSpecGuide/DuplicateBeforeHooks:
+  Description: "Detect duplicate before hooks in sibling contexts (ERROR if in all, WARNING if partial)"
+  Enabled: true
+  WarnOnPartialDuplicates: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+RSpecGuide/InvariantExamples:
+  Description: "Invariant examples should be in leaf contexts or extracted to shared_examples"
+  Enabled: true
+  MinLeafContexts: 3
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+RSpecGuide/HappyPathFirst:
+  Description: "Corner cases should not be first context (happy path first)"
+  Enabled: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+RSpecGuide/ContextSetup:
+  Description: "Context must have setup (let/before) to distinguish it from parent. Subject should be at describe level."
+  Enabled: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"
+
+FactoryBotGuide/DynamicAttributesForTimeAndRandom:
+  Description: "Wrap Time.now, SecureRandom and method calls in blocks for dynamic evaluation"
+  Enabled: true
+  StyleGuideUrl: "https://github.com/rspec-guide/rspec-guide"

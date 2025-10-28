@@ -1,0 +1,37 @@
+require:
+  - ./lib/rubocop-rspec-guide
+
+inherit_gem:
+  standard: config/base.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.0
+  Exclude:
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'bin/**/*'
+    - '.devbox/**/*'
+
+# Enable our custom cops
+RSpecGuide/CharacteristicsAndContexts:
+  Enabled: true
+
+RSpecGuide/HappyPathFirst:
+  Enabled: true
+
+RSpecGuide/ContextSetup:
+  Enabled: true
+
+RSpecGuide/DuplicateLetValues:
+  Enabled: true
+
+RSpecGuide/DuplicateBeforeHooks:
+  Enabled: true
+
+RSpecGuide/InvariantExamples:
+  Enabled: true
+  MinLeafContexts: 3
+
+FactoryBotGuide/DynamicAttributesForTimeAndRandom:
+  Enabled: true
