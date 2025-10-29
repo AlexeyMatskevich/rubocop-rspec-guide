@@ -147,5 +147,31 @@ RSpec.describe RuboCop::Cop::RSpecGuide::HappyPathFirst, :config do
         RUBY
       end
     end
+
+    context "when there are examples before first context" do
+      it "does not register an offense even if first context is corner case" do
+        expect_no_offenses(<<~RUBY)
+          describe '#process' do
+            it { expect(result).to be_valid }
+
+            context 'but user is blocked' do
+              it { expect(result).to be_error }
+            end
+          end
+        RUBY
+      end
+
+      it "does not register an offense with specify blocks" do
+        expect_no_offenses(<<~RUBY)
+          describe '#process' do
+            specify { expect(result).to be_valid }
+
+            context 'but user is blocked' do
+              it { expect(result).to be_error }
+            end
+          end
+        RUBY
+      end
+    end
   end
 end

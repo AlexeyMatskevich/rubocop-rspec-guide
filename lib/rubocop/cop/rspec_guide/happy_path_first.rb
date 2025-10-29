@@ -6,6 +6,10 @@ module RuboCop
       # Checks that corner cases are not the first context in a describe block.
       # Happy path should come first for better readability.
       #
+      # The cop allows corner case contexts to appear first if there are
+      # example blocks (it/specify) before the first context, as those examples
+      # represent the happy path.
+      #
       # @example
       #   # bad
       #   describe '#process' do
@@ -33,6 +37,17 @@ module RuboCop
       #       # ...
       #     end
       #     context 'but payment fails' do
+      #       # ...
+      #     end
+      #   end
+      #
+      #   # good - examples before first context represent happy path
+      #   describe '#add_child' do
+      #     it 'adds child to children collection' do
+      #       # ...
+      #     end
+      #
+      #     context 'but child is already in collection' do
       #       # ...
       #     end
       #   end
@@ -67,6 +82,10 @@ module RuboCop
           contexts = collect_direct_child_contexts(node)
           return if contexts.size < 2
 
+          # If there are any examples (it/specify) before the first context,
+          # this is a happy path, so no offense
+          return if has_examples_before_first_context?(node, contexts.first)
+
           # Check first context
           context_with_description?(contexts.first) do |description|
             if corner_case_context?(description)
@@ -79,6 +98,30 @@ module RuboCop
         end
 
         private
+
+        def has_examples_before_first_context?(node, first_context)
+          body = node.body
+          return false unless body
+
+          children = body.begin_type? ? body.children : [body]
+
+          children.each do |child|
+            # Stop when we reach the first context
+            break if child == first_context
+
+            # Check if this is an example (it/specify)
+            return true if example?(child)
+          end
+
+          false
+        end
+
+        def example?(node)
+          return false unless node.block_type?
+
+          send_node = node.send_node
+          send_node.method?(:it) || send_node.method?(:specify)
+        end
 
         def collect_direct_child_contexts(node)
           body = node.body

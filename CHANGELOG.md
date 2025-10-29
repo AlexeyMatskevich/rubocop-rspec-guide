@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [0.2.1] - 2025-10-29
+
+### Changed
+- **RSpecGuide/HappyPathFirst**: Allow corner case contexts when examples (it/specify) appear before first context
+  - Examples before contexts are considered happy path
+  - No offense if at least one example exists before the first context
+
 ## [0.2.0] - 2025-10-28
 
 ### Changed
