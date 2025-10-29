@@ -235,4 +235,22 @@ RSpec.describe RuboCop::Cop::RSpecGuide::DuplicateLetValues, :config do
       end
     RUBY
   end
+
+  it "handles empty let blocks without crashing" do
+    expect_no_offenses(<<~RUBY)
+      describe '#descendants' do
+        context 'when setting has no children' do
+          let(:no_children) {}
+
+          it { expect(result).to be_empty }
+        end
+
+        context 'when setting has children' do
+          let(:child) { create(:child) }
+
+          it { expect(result).not_to be_empty }
+        end
+      end
+    RUBY
+  end
 end

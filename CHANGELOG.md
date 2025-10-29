@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.2.2] - 2025-10-29
+
+### Fixed
+- **RSpecGuide/DuplicateLetValues**: Fix crash when encountering empty let blocks (e.g., `let(:foo) {}`)
+  - Added nil check in `simple_value?` method to handle cases where let block has no body
+
 ## [0.2.1] - 2025-10-29
 
 ### Changed

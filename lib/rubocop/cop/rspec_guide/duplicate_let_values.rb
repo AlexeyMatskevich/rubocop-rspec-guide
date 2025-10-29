@@ -159,6 +159,8 @@ module RuboCop
         end
 
         def simple_value?(node)
+          return false if node.nil?
+
           # Values we can safely compare by source
           return true if node.sym_type? || node.str_type? || node.int_type? || node.float_type?
           return true if node.true_type? || node.false_type? || node.nil_type?
