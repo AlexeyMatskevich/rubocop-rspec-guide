@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubocop-rspec-guide (0.2.0)
+    rubocop-rspec-guide (0.2.2)
       rubocop (~> 1.50)
       rubocop-rspec (~> 2.20)
 
