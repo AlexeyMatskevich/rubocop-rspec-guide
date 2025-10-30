@@ -559,6 +559,19 @@ end
 
 **Note:** The old name `FactoryBotGuide/DynamicAttributesForTimeAndRandom` is deprecated but still works as an alias.
 
+## Documentation
+
+Full API documentation is available:
+
+- **Generate locally**: `bundle exec rake doc`
+- **View documentation**: Open `doc/index.html` in your browser
+- **Quick open**: `bundle exec rake doc_open`
+
+The documentation includes:
+- Detailed cop descriptions with examples
+- Configuration options for each cop
+- API reference for all classes and modules
+
 ## Development
 
 After checking out the repo:
@@ -568,9 +581,23 @@ bundle install
 bundle exec rspec
 ```
 
+Generate documentation:
+
+```bash
+bundle exec rake doc
+```
+
+Run benchmarks:
+
+```bash
+bundle exec rake benchmark:quick
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 

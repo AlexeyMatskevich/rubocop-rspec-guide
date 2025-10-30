@@ -40,4 +40,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "standard", "~> 1.24"
   spec.add_development_dependency "benchmark-ips", "~> 2.0"
+  spec.add_development_dependency "yard", "~> 0.9"
 end
