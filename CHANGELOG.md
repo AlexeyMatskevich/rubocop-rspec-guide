@@ -1,5 +1,23 @@
 ## [Unreleased]
 
+## [0.3.1] - 2025-10-30
+
+### Added
+- **Plugin support for RuboCop 1.72+**: Added `lib/rubocop/rspec/guide/plugin.rb` for modern plugin system
+  - Now supports both `plugins:` (recommended for RuboCop 1.72+) and `require:` (legacy) configuration
+  - Fully backward compatible with older RuboCop versions
+- **Version metadata in config/default.yml**: Added `VersionAdded` and `VersionChanged` fields to all cops
+  - Follows RuboCop conventions for tracking cop history
+  - Helps users understand when cops were introduced and modified
+
+### Changed
+- **README.md**: Updated with both modern (`plugins:`) and legacy (`require:`) configuration examples
+  - Clear documentation for different RuboCop versions
+  - Migration guidance for users upgrading RuboCop
+
+### Fixed
+- **Build process**: Added `*.gem` to `.gitignore` to prevent built gems from being committed
+
 ## [0.3.0] - 2025-10-30
 
 ### Added

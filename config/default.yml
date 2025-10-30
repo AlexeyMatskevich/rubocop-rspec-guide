@@ -2,47 +2,61 @@
 RSpecGuide/MinimumBehavioralCoverage:
   Description: "Require at least 2 behavioral variations in describe block (2+ contexts OR it-blocks + contexts)"
   Enabled: true
+  VersionAdded: "0.3.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/CharacteristicsAndContexts:
   Description: "[DEPRECATED] Use RSpecGuide/MinimumBehavioralCoverage instead"
   Enabled: true
+  VersionAdded: "0.1.0"
+  VersionChanged: "0.3.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/DuplicateLetValues:
   Description: "Detect duplicate let values in sibling contexts (ERROR if in all, WARNING if partial)"
   Enabled: true
   WarnOnPartialDuplicates: true
+  VersionAdded: "0.1.0"
+  VersionChanged: "0.2.2"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/DuplicateBeforeHooks:
   Description: "Detect duplicate before hooks in sibling contexts (ERROR if in all, WARNING if partial)"
   Enabled: true
   WarnOnPartialDuplicates: true
+  VersionAdded: "0.1.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/InvariantExamples:
   Description: "Invariant examples should be in leaf contexts or extracted to shared_examples"
   Enabled: true
   MinLeafContexts: 3
+  VersionAdded: "0.1.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/HappyPathFirst:
   Description: "Corner cases should not be first context (happy path first)"
   Enabled: true
+  VersionAdded: "0.1.0"
+  VersionChanged: "0.2.1"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 RSpecGuide/ContextSetup:
   Description: "Context must have setup (let/before) to distinguish it from parent. Subject should be at describe level."
   Enabled: true
+  VersionAdded: "0.1.0"
+  VersionChanged: "0.2.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 FactoryBotGuide/DynamicAttributeEvaluation:
   Description: "Wrap method calls in blocks for dynamic evaluation (Time.now, SecureRandom, etc.)"
   Enabled: true
+  VersionAdded: "0.3.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
 FactoryBotGuide/DynamicAttributesForTimeAndRandom:
   Description: "[DEPRECATED] Use FactoryBotGuide/DynamicAttributeEvaluation instead"
   Enabled: true
+  VersionAdded: "0.1.0"
+  VersionChanged: "0.3.0"
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"

@@ -18,9 +18,30 @@ gem install rubocop-rspec-guide
 
 ## Usage
 
+### Modern Approach (RuboCop 1.72+)
+
 Add to your `.rubocop.yml`:
 
 ```yaml
+# Modern plugin system (recommended for RuboCop 1.72+)
+plugins:
+  - rubocop-rspec-guide
+
+# Optionally inherit the default config
+inherit_gem:
+  rubocop-rspec-guide: config/default.yml
+
+# Recommended: Enable RSpec/LeadingSubject to ensure subject is at describe level
+RSpec/LeadingSubject:
+  Enabled: true
+```
+
+### Legacy Approach (RuboCop < 1.72)
+
+For older versions of RuboCop, use `require:` instead:
+
+```yaml
+# Legacy require system (for RuboCop < 1.72)
 require:
   - rubocop-rspec-guide
 
@@ -33,10 +54,13 @@ RSpec/LeadingSubject:
   Enabled: true
 ```
 
-Or configure cops individually:
+### Individual Configuration
+
+Configure cops individually with either approach:
 
 ```yaml
-require:
+# Use 'plugins:' (RuboCop 1.72+) or 'require:' (older versions)
+plugins:
   - rubocop-rspec-guide
 
 RSpecGuide/MinimumBehavioralCoverage:

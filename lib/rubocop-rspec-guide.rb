@@ -4,6 +4,7 @@ require "rubocop"
 require "rubocop-rspec"
 
 require_relative "rubocop/rspec/guide/version"
+require_relative "rubocop/rspec/guide/plugin"
 require_relative "rubocop/cop/rspec_guide/minimum_behavioral_coverage"
 require_relative "rubocop/cop/rspec_guide/characteristics_and_contexts"
 require_relative "rubocop/cop/rspec_guide/duplicate_let_values"
