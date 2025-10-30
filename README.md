@@ -1,5 +1,10 @@
 # RuboCop RSpec Guide
 
+[![Gem Version](https://badge.fury.io/rb/rubocop-rspec-guide.svg)](https://badge.fury.io/rb/rubocop-rspec-guide)
+[![Downloads](https://img.shields.io/gem/dt/rubocop-rspec-guide.svg)](https://rubygems.org/gems/rubocop-rspec-guide)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
+[![Ruby Version](https://img.shields.io/badge/ruby-%3E%3D%203.0.0-blue.svg)](https://www.ruby-lang.org)
+
 Custom RuboCop cops that enforce best practices from the [RSpec Style Guide](https://github.com/AlexeyMatskevich/rspec-guide).
 
 ## Installation
