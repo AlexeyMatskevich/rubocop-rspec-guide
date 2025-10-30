@@ -18,3 +18,8 @@ IMPROVEMENTS_SUMMARY.md
 
 # Built gems
 *.gem
+
+# Benchmark results (but keep baseline files)
+benchmark/results/
+benchmark/*.txt
+!benchmark/baseline_*.txt

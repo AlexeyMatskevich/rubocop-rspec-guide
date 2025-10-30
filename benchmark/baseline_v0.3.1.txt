@@ -1,0 +1,67 @@
+================================================================================
+RuboCop RSpec Guide - Performance Baseline v0.3.1
+================================================================================
+
+Date: 2025-10-30
+Ruby Version: 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+RuboCop Version: 1.80.2
+Gem Version: 0.3.1
+Mode: QUICK (time: 2s, warmup: 1s)
+
+================================================================================
+TYPICAL FILES (10-20 lines, simple RSpec examples)
+================================================================================
+
+MinimumBehavioralCoverage (with violation):     2.457k (± 1.7%) i/s  (407.05 μs/i)
+MinimumBehavioralCoverage (without violation):  1.683k (± 1.4%) i/s  (594.34 μs/i)
+  Comparison: with violation is 1.46x faster
+
+HappyPathFirst:                                 2.003k (± 1.1%) i/s  (499.23 μs/i)
+
+ContextSetup:                                   2.040k (± 0.8%) i/s  (490.26 μs/i)
+
+DuplicateLetValues:                             1.499k (± 1.0%) i/s  (666.97 μs/i)
+
+DuplicateBeforeHooks:                           1.626k (± 1.6%) i/s  (614.99 μs/i)
+
+InvariantExamples:                              1.504k (± 0.8%) i/s  (664.90 μs/i)
+
+DynamicAttributeEvaluation:                     2.423k (± 0.7%) i/s  (412.77 μs/i)
+
+================================================================================
+SCALABILITY (increasing file sizes)
+================================================================================
+
+MinimumBehavioralCoverage - 5 contexts (87 lines):
+  356.636 (± 0.3%) i/s  (2.80 ms/i)
+
+MinimumBehavioralCoverage - 10 contexts (172 lines):
+  166.626 (± 1.2%) i/s  (6.00 ms/i)
+
+MinimumBehavioralCoverage - 20 contexts (342 lines):
+  73.298 (± 1.4%) i/s  (13.64 ms/i)
+
+Scaling Analysis:
+  5 → 10 contexts: 2.1x slower (expected ~2x) ✅
+  10 → 20 contexts: 2.3x slower (expected ~2x) ✅
+  Overall complexity: O(n) - linear ✅
+
+================================================================================
+SUMMARY
+================================================================================
+
+Performance Rating: EXCELLENT ⚡
+
+All cops meet or exceed performance targets:
+- Typical files: 1,499-2,457 i/s (target: > 1,000 i/s) ✅
+- Large files: 73-357 i/s (target: > 50 i/s) ✅
+- Complexity: O(n) linear (target: no exponential) ✅
+
+Real-world impact:
+- 100 typical files: ~0.05 seconds
+- 100 large files: ~1.4 seconds
+- Suitable for CI/CD pipelines ✅
+
+No optimization required at this time.
+
+================================================================================

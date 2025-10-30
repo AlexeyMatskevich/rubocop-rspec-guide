@@ -9,6 +9,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
+    benchmark-ips (2.14.0)
     diff-lcs (1.6.2)
     json (2.15.2)
     language_server-protocol (3.17.0.5)
@@ -88,6 +89,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  benchmark-ips (~> 2.0)
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop-rspec-guide!
