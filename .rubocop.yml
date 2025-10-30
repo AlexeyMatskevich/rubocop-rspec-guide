@@ -8,13 +8,13 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 3.0
   Exclude:
-    - 'vendor/**/*'
-    - 'tmp/**/*'
-    - 'bin/**/*'
-    - '.devbox/**/*'
+    - "vendor/**/*"
+    - "tmp/**/*"
+    - "bin/**/*"
+    - ".devbox/**/*"
 
 # Enable our custom cops
-RSpecGuide/CharacteristicsAndContexts:
+RSpecGuide/MinimumBehavioralCoverage:
   Enabled: true
 
 RSpecGuide/HappyPathFirst:
@@ -33,5 +33,5 @@ RSpecGuide/InvariantExamples:
   Enabled: true
   MinLeafContexts: 3
 
-FactoryBotGuide/DynamicAttributesForTimeAndRandom:
+FactoryBotGuide/DynamicAttributeEvaluation:
   Enabled: true

@@ -1,5 +1,36 @@
 ## [Unreleased]
 
+## [0.3.0] - 2025-10-30
+
+### Added
+- **RSpecGuide/MinimumBehavioralCoverage**: New cop replacing CharacteristicsAndContexts with enhanced functionality
+  - Now supports two patterns for behavioral variations:
+    1. Traditional: 2+ sibling context blocks
+    2. New: it-blocks (default behavior) + context-blocks (edge cases)
+  - Better reflects the goal: ensuring minimum behavioral coverage in tests
+- **FactoryBotGuide/DynamicAttributeEvaluation**: New cop replacing DynamicAttributesForTimeAndRandom
+  - More accurate name reflecting broader scope: checks ALL method calls, not just Time/Random
+  - Covers Time.now, SecureRandom.hex, 1.day.from_now, Array.new, and any other method calls
+  - Ensures dynamic evaluation by requiring block syntax for all method-based attributes
+- **config/obsoletion.yml**: Added cop obsoletion configuration for tracking renamed cops
+
+### Changed
+- **RSpecGuide/MinimumBehavioralCoverage**: Enhanced to accept it-blocks + context-blocks pattern
+  - Validates that it-blocks appear before context-blocks (strict ordering)
+  - Allows tests with before/let setup + it-blocks + context-blocks
+  - Updated error messages to explain both valid patterns
+- Improved documentation and examples in README.md
+  - Added examples for new it-blocks + context-blocks pattern
+  - Clarified that deprecated cop names still work as aliases
+
+### Deprecated
+- **RSpecGuide/CharacteristicsAndContexts**: Deprecated in favor of MinimumBehavioralCoverage
+  - Still works as an alias for backward compatibility
+  - Will be removed in a future major version
+- **FactoryBotGuide/DynamicAttributesForTimeAndRandom**: Deprecated in favor of DynamicAttributeEvaluation
+  - Still works as an alias for backward compatibility
+  - Will be removed in a future major version
+
 ## [0.2.2] - 2025-10-29
 
 ### Fixed

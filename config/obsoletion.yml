@@ -1,0 +1,6 @@
+# Cop obsoletion configuration for rubocop-rspec-guide
+# This file defines renamed, removed, and deprecated cops
+
+renamed:
+  RSpecGuide/CharacteristicsAndContexts: RSpecGuide/MinimumBehavioralCoverage
+  FactoryBotGuide/DynamicAttributesForTimeAndRandom: FactoryBotGuide/DynamicAttributeEvaluation

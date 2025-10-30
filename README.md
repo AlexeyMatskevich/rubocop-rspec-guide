@@ -39,7 +39,7 @@ Or configure cops individually:
 require:
   - rubocop-rspec-guide
 
-RSpecGuide/CharacteristicsAndContexts:
+RSpecGuide/MinimumBehavioralCoverage:
   Enabled: true
 
 RSpecGuide/HappyPathFirst:
@@ -58,15 +58,15 @@ RSpecGuide/InvariantExamples:
   Enabled: true
   MinLeafContexts: 3
 
-FactoryBotGuide/DynamicAttributesForTimeAndRandom:
+FactoryBotGuide/DynamicAttributeEvaluation:
   Enabled: true
 ```
 
 ## Cops
 
-### RSpecGuide/CharacteristicsAndContexts
+### RSpecGuide/MinimumBehavioralCoverage
 
-Requires at least 2 contexts in a describe block (happy path + edge cases).
+Requires at least 2 behavioral variations in a describe block: either 2+ sibling contexts OR it-blocks + context-blocks.
 
 ```ruby
 # bad
@@ -74,7 +74,7 @@ describe '#calculate' do
   it 'works' { expect(result).to eq(100) }
 end
 
-# good
+# good - 2+ contexts
 describe '#calculate' do
   context 'with valid data' do
     it { expect(result).to eq(100) }
@@ -84,7 +84,20 @@ describe '#calculate' do
     it { expect(result).to be_error }
   end
 end
+
+# good - it-blocks + context-blocks
+describe '#calculate' do
+  it 'works with defaults' do
+    expect(result).to eq(100)
+  end
+
+  context 'with invalid data' do
+    it { expect(result).to be_error }
+  end
+end
 ```
+
+**Note:** The old name `RSpecGuide/CharacteristicsAndContexts` is deprecated but still works as an alias.
 
 ### RSpecGuide/HappyPathFirst
 
@@ -255,23 +268,30 @@ context 'A' do
 end
 ```
 
-### FactoryBotGuide/DynamicAttributesForTimeAndRandom
+### FactoryBotGuide/DynamicAttributeEvaluation
 
-Ensures time and random values are wrapped in blocks.
+Ensures method calls in factory attributes are wrapped in blocks for dynamic evaluation.
 
 ```ruby
-# bad
+# bad - method calls evaluated once at factory load time
 factory :user do
-  created_at Time.now       # evaluated once!
+  created_at Time.now       # same timestamp for all users!
   token SecureRandom.hex    # same token for all users!
+  expires_at 1.day.from_now # same expiry for all users!
+  tags Array.new            # same array instance shared!
 end
 
-# good
+# good - wrapped in blocks for dynamic evaluation
 factory :user do
   created_at { Time.now }
   token { SecureRandom.hex }
+  expires_at { 1.day.from_now }
+  tags { Array.new }
+  name "John"               # static values are OK
 end
 ```
+
+**Note:** The old name `FactoryBotGuide/DynamicAttributesForTimeAndRandom` is deprecated but still works as an alias.
 
 ## Development
 

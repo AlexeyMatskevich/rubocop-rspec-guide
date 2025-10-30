@@ -1,6 +1,11 @@
 ---
+RSpecGuide/MinimumBehavioralCoverage:
+  Description: "Require at least 2 behavioral variations in describe block (2+ contexts OR it-blocks + contexts)"
+  Enabled: true
+  StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
+
 RSpecGuide/CharacteristicsAndContexts:
-  Description: "Require at least 2 contexts in describe block (happy path + edge cases)"
+  Description: "[DEPRECATED] Use RSpecGuide/MinimumBehavioralCoverage instead"
   Enabled: true
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
@@ -32,7 +37,12 @@ RSpecGuide/ContextSetup:
   Enabled: true
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
 
+FactoryBotGuide/DynamicAttributeEvaluation:
+  Description: "Wrap method calls in blocks for dynamic evaluation (Time.now, SecureRandom, etc.)"
+  Enabled: true
+  StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"
+
 FactoryBotGuide/DynamicAttributesForTimeAndRandom:
-  Description: "Wrap Time.now, SecureRandom and method calls in blocks for dynamic evaluation"
+  Description: "[DEPRECATED] Use FactoryBotGuide/DynamicAttributeEvaluation instead"
   Enabled: true
   StyleGuideUrl: "https://github.com/AlexeyMatskevich/rspec-guide"

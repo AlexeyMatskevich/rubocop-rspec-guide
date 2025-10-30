@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RuboCop::Cop::RSpecGuide::CharacteristicsAndContexts, :config do
+RSpec.describe RuboCop::Cop::RSpecGuide::MinimumBehavioralCoverage, :config do
   subject(:cop) { described_class.new(config) }
 
   let(:config) { RuboCop::Config.new }
@@ -13,7 +13,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::CharacteristicsAndContexts, :config do
       it "registers an offense" do
         expect_offense(<<~RUBY)
           describe '#calculate' do
-          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/CharacteristicsAndContexts: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/CharacteristicsAndContexts` for simple cases (e.g., getters) with no edge cases.
+          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/MinimumBehavioralCoverage: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage` for simple cases (e.g., getters) with no edge cases.
             it 'works' do
               expect(result).to eq(100)
             end
@@ -26,7 +26,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::CharacteristicsAndContexts, :config do
       it "registers an offense" do
         expect_offense(<<~RUBY)
           describe '#calculate' do
-          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/CharacteristicsAndContexts: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/CharacteristicsAndContexts` for simple cases (e.g., getters) with no edge cases.
+          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/MinimumBehavioralCoverage: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage` for simple cases (e.g., getters) with no edge cases.
             context 'when valid' do
               it 'works' do
                 expect(result).to eq(100)
@@ -41,7 +41,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::CharacteristicsAndContexts, :config do
       it "registers an offense" do
         expect_offense(<<~RUBY)
           describe '#calculate' do
-          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/CharacteristicsAndContexts: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/CharacteristicsAndContexts` for simple cases (e.g., getters) with no edge cases.
+          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/MinimumBehavioralCoverage: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage` for simple cases (e.g., getters) with no edge cases.
             context 'when valid' do
               context 'with premium' do
                 it 'works' do
@@ -197,7 +197,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::CharacteristicsAndContexts, :config do
       it "registers an offense" do
         expect_offense(<<~RUBY)
           describe '#calculate' do
-          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/CharacteristicsAndContexts: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/CharacteristicsAndContexts` for simple cases (e.g., getters) with no edge cases.
+          ^^^^^^^^^^^^^^^^^^^^^^^^ RSpecGuide/MinimumBehavioralCoverage: Describe block should test at least 2 behavioral variations: either use 2+ sibling contexts (happy path + edge cases), or combine it-blocks for default behavior with context-blocks for edge cases. Use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage` for simple cases (e.g., getters) with no edge cases.
             it 'calculates with defaults' do
               expect(result).to eq(100)
             end
