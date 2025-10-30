@@ -102,33 +102,31 @@ module RuboCop
       #     end
       #   end
       #
-      class DuplicateLetValues < Base
+      class DuplicateLetValues < RuboCop::Cop::RSpec::Base
         MSG_ERROR = "Duplicate `let(:%<name>s)` with same value `%<value>s` " \
                     "in ALL sibling contexts. Extract to parent context."
         MSG_WARNING = "Let `:%<name>s` with value `%<value>s` duplicated in %<count>d/%<total>d contexts. " \
                       "Consider refactoring test hierarchy - this suggests poor organization."
 
-        # @!method context_block?(node)
-        def_node_matcher :context_block?, <<~PATTERN
+        # Using rubocop-rspec API: example_group?(node) from Base
+        # Custom matchers:
+
+        # @!method context_only?(node)
+        def_node_matcher :context_only?, <<~PATTERN
           (block (send nil? :context ...) ...)
         PATTERN
 
-        # @!method let_declaration?(node)
-        def_node_matcher :let_declaration?, <<~PATTERN
+        # @!method let_with_name_and_value?(node)
+        def_node_matcher :let_with_name_and_value?, <<~PATTERN
           (block
             (send nil? {:let :let!} (sym $_name))
             (args)
             $_value)
         PATTERN
 
-        # @!method example_group?(node)
-        def_node_matcher :example_group?, <<~PATTERN
-          (block
-            (send nil? {:describe :context} ...)
-            ...)
-        PATTERN
-
         def on_block(node)
+          # Fast pre-check: only process describe/context blocks
+          return unless node.method?(:describe) || node.method?(:context)
           return unless example_group?(node)
 
           # Collect all sibling contexts
@@ -155,8 +153,8 @@ module RuboCop
 
           if body.begin_type?
             # Multiple children wrapped in begin node
-            body.children.select { |child| child.block_type? && context_block?(child) }
-          elsif body.block_type? && context_block?(body)
+            body.children.select { |child| child.block_type? && context_only?(child) }
+          elsif body.block_type? && context_only?(body)
             # Single context child
             [body]
           else
@@ -174,7 +172,7 @@ module RuboCop
               (block_node.parent.begin_type? && block_node.parent.parent == context_node)
             next unless is_immediate_child
 
-            let_declaration?(block_node) do |name, value|
+            let_with_name_and_value?(block_node) do |name, value|
               # Only check simple values that can be compared by source
               if simple_value?(value)
                 lets[name] = {value: value.source, node: block_node}

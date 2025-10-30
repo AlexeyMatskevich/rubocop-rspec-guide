@@ -1,4 +1,21 @@
 ---
+# RSpec Language configuration for rubocop-rspec integration
+# This enables RuboCop::Cop::RSpec::Base matchers to work properly
+RSpec:
+  Enabled: true
+  Language:
+    inherit_mode:
+      merge:
+        - Expectations
+        - Helpers
+        - Hooks
+        - Subjects
+    Helpers:
+      - let
+      - let!
+      - let_it_be
+      - let_it_be!
+
 RSpecGuide/MinimumBehavioralCoverage:
   Description: "Require at least 2 behavioral variations in describe block (2+ contexts OR it-blocks + contexts)"
   Enabled: true

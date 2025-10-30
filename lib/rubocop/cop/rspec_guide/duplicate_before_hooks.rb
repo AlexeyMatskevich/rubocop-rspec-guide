@@ -102,33 +102,31 @@ module RuboCop
       #     end
       #   end
       #
-      class DuplicateBeforeHooks < Base
+      class DuplicateBeforeHooks < RuboCop::Cop::RSpec::Base
         MSG_ERROR = "Duplicate `before` hook in ALL sibling contexts. " \
                     "Extract to parent context."
         MSG_WARNING = "Before hook duplicated in %<count>d/%<total>d sibling contexts. " \
                       "Consider refactoring test hierarchy - this suggests poor organization."
 
-        # @!method context_block?(node)
-        def_node_matcher :context_block?, <<~PATTERN
+        # Using rubocop-rspec API: example_group?(node) and hook?(node) from Base
+        # Custom matchers:
+
+        # @!method context_only?(node)
+        def_node_matcher :context_only?, <<~PATTERN
           (block (send nil? :context ...) ...)
         PATTERN
 
-        # @!method before_hook?(node)
-        def_node_matcher :before_hook?, <<~PATTERN
+        # @!method before_hook_with_body?(node)
+        def_node_matcher :before_hook_with_body?, <<~PATTERN
           (block
             (send nil? :before ...)
             (args)
             $_body)
         PATTERN
 
-        # @!method example_group?(node)
-        def_node_matcher :example_group?, <<~PATTERN
-          (block
-            (send nil? {:describe :context} ...)
-            ...)
-        PATTERN
-
         def on_block(node)
+          # Fast pre-check: only process describe/context blocks
+          return unless node.method?(:describe) || node.method?(:context)
           return unless example_group?(node)
 
           # Collect all sibling contexts
@@ -155,8 +153,8 @@ module RuboCop
 
           if body.begin_type?
             # Multiple children wrapped in begin node
-            body.children.select { |child| child.block_type? && context_block?(child) }
-          elsif body.block_type? && context_block?(body)
+            body.children.select { |child| child.block_type? && context_only?(child) }
+          elsif body.block_type? && context_only?(body)
             # Single context child
             [body]
           else
@@ -175,7 +173,7 @@ module RuboCop
               (block_node.parent.begin_type? && block_node.parent.parent == context_node)
             next unless is_immediate_child
 
-            before_hook?(block_node) do |body|
+            before_hook_with_body?(block_node) do |body|
               befores << {body_source: normalize_source(body.source), node: block_node}
             end
           end

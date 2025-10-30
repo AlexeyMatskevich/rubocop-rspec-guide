@@ -93,28 +93,21 @@ module RuboCop
       #     end
       #   end
       #
-      class ContextSetup < Base
+      class ContextSetup < RuboCop::Cop::RSpec::Base
         MSG = "Context should have setup (let/let!/let_it_be/let_it_be!/before) to distinguish it from parent context"
 
-        # @!method context_block?(node)
-        def_node_matcher :context_block?, <<~PATTERN
-          (block
-            (send nil? :context ...)
-            ...)
-        PATTERN
+        # Using rubocop-rspec API: let?(node) and hook?(node) from Base
+        # Custom matcher for context-only:
 
-        # @!method let_declaration?(node)
-        def_node_matcher :let_declaration?, <<~PATTERN
-          (block (send nil? {:let :let! :let_it_be :let_it_be!} ...) ...)
-        PATTERN
-
-        # @!method before_hook?(node)
-        def_node_matcher :before_hook?, <<~PATTERN
-          (block (send nil? :before ...) ...)
+        # @!method context_only?(node)
+        def_node_matcher :context_only?, <<~PATTERN
+          (block (send nil? :context ...) ...)
         PATTERN
 
         def on_block(node)
-          return unless context_block?(node)
+          # Fast pre-check: only process context blocks
+          return unless node.method?(:context)
+          return unless context_only?(node)
 
           # Check if context has at least one setup node (let or before)
           # Note: subject is NOT counted as context setup because it describes
@@ -134,7 +127,8 @@ module RuboCop
               (block_node.parent.begin_type? && block_node.parent.parent == context_node)
             next unless is_immediate_child
 
-            return true if let_declaration?(block_node) || before_hook?(block_node)
+            # Use rubocop-rspec API matchers
+            return true if let?(block_node) || (hook?(block_node) && block_node.method?(:before))
           end
 
           false

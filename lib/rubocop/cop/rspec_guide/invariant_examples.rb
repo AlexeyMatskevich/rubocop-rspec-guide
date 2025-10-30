@@ -90,9 +90,20 @@ module RuboCop
       #     end
       #   end
       #
-      class InvariantExamples < Base
+      class InvariantExamples < RuboCop::Cop::RSpec::Base
         MSG = "Example `%<description>s` repeats in all %<count>d leaf contexts. " \
               "Consider extracting to shared_examples as an interface invariant."
+
+        # Using rubocop-rspec API: example_group?(node) from Base for top-level check
+        # Custom matchers for performance-critical internal checks:
+
+        # Fast local matcher for nested context/describe checks (performance-critical)
+        # @!method context_or_describe_block?(node)
+        def_node_matcher :context_or_describe_block?, <<~PATTERN
+          (block
+            (send nil? {:describe :context} ...)
+            ...)
+        PATTERN
 
         # @!method example_with_description?(node)
         def_node_matcher :example_with_description?, <<~PATTERN
@@ -101,22 +112,10 @@ module RuboCop
             ...)
         PATTERN
 
-        # @!method context_or_describe?(node)
-        def_node_matcher :context_or_describe?, <<~PATTERN
-          (block
-            (send nil? {:describe :context} ...)
-            ...)
-        PATTERN
-
-        # @!method top_level_describe?(node)
-        def_node_matcher :top_level_describe?, <<~PATTERN
-          (block
-            (send nil? :describe ...)
-            ...)
-        PATTERN
-
         def on_block(node)
-          return unless top_level_describe?(node)
+          # Fast pre-check: only process top-level describe (not context)
+          return unless node.method?(:describe)
+          return unless example_group?(node)
 
           # Find all leaf contexts (contexts with no nested contexts)
           leaf_contexts = find_leaf_contexts(node)
@@ -154,11 +153,12 @@ module RuboCop
           leaves = []
 
           node.each_descendant(:block) do |child|
-            next unless context_or_describe?(child)
+            # Use fast local matcher for performance-critical nested checks
+            next unless context_or_describe_block?(child)
 
             # Check if this context has nested contexts
             has_nested = child.each_descendant(:block).any? do |nested|
-              context_or_describe?(nested) && nested != child
+              context_or_describe_block?(nested) && nested != child
             end
 
             leaves << child unless has_nested

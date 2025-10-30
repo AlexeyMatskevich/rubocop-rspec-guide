@@ -40,18 +40,24 @@ gem install rubocop-rspec-guide
 
 3. **Configure `.rubocop.yml`:**
    
-   **Modern approach (RuboCop 1.72+):**
+   **Minimal configuration (v0.4.0+):**
    ```yaml
+   # RuboCop 1.72+
    plugins:
      - rubocop-rspec-guide
    
-   inherit_gem:
-     rubocop-rspec-guide: config/default.yml
+   # RuboCop < 1.72
+   require:
+     - rubocop-rspec-guide
    ```
    
-   **Legacy approach (RuboCop < 1.72):**
+   The gem automatically loads its default configuration, including RSpec Language settings.
+   
+   **Optional - explicit config inheritance:**
+   
+   If you want to explicitly inherit the config (not required):
    ```yaml
-   require:
+   plugins:
      - rubocop-rspec-guide
    
    inherit_gem:
@@ -327,6 +333,33 @@ end
 ```
 
 ### Migration Guide
+
+#### Upgrading to v0.4.0
+
+**Configuration changes:**
+
+Starting from v0.4.0, the gem automatically injects its default configuration, including RSpec Language settings. You can simplify your `.rubocop.yml`:
+
+```yaml
+# Before (v0.3.x) - explicit inheritance required
+plugins:
+  - rubocop-rspec-guide
+
+inherit_gem:
+  rubocop-rspec-guide: config/default.yml
+
+# After (v0.4.0+) - automatic config injection
+plugins:
+  - rubocop-rspec-guide
+```
+
+**What changed:**
+- ✅ `let_it_be` and `let_it_be!` are now automatically recognized (from `test-prof` / `rspec-rails`)
+- ✅ All cops now use `RuboCop::Cop::RSpec::Base` for better RSpec DSL detection
+- ✅ Significant performance improvement: `InvariantExamples` is 4.25x faster
+- ✅ More accurate detection of RSpec constructs
+
+**No code changes needed** - your existing RSpec tests will work as before, but with better analysis.
 
 #### From CharacteristicsAndContexts to MinimumBehavioralCoverage
 

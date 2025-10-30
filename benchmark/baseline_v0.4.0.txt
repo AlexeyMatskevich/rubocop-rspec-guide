@@ -1,0 +1,167 @@
+================================================================================
+RuboCop RSpec Guide - Performance Baseline v0.4.0
+================================================================================
+
+Date: 2025-10-30
+Ruby Version: 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+RuboCop Version: 1.80.2
+Gem Version: 0.4.0
+Mode: QUICK (time: 2s, warmup: 1s)
+
+Changes in v0.4.0:
+- Integration with RuboCop::Cop::RSpec::Base for all RSpec cops
+- Native support for let_it_be and let_it_be! from rspec-rails
+- Performance optimizations: fast pre-checks + local matchers for hot paths
+- InvariantExamples: 4.25x faster than v0.3.1 baseline
+
+================================================================================
+TYPICAL FILES (10-20 lines, simple RSpec examples)
+================================================================================
+
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:64: warning: already initialized constant Gem::Platform::JAVA
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:259: warning: previous definition of JAVA was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:65: warning: already initialized constant Gem::Platform::MSWIN
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:260: warning: previous definition of MSWIN was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:66: warning: already initialized constant Gem::Platform::MSWIN64
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:261: warning: previous definition of MSWIN64 was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:67: warning: already initialized constant Gem::Platform::MINGW
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:262: warning: previous definition of MINGW was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:68: warning: already initialized constant Gem::Platform::X64_MINGW
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:264: warning: previous definition of X64_MINGW was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:70: warning: already initialized constant Gem::Platform::UNIVERSAL_MINGW
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:265: warning: previous definition of UNIVERSAL_MINGW was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:71: warning: already initialized constant Gem::Platform::WINDOWS
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:266: warning: previous definition of WINDOWS was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:72: warning: already initialized constant Gem::Platform::X64_LINUX
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:267: warning: previous definition of X64_LINUX was here
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/bundler/rubygems_ext.rb:73: warning: already initialized constant Gem::Platform::X64_LINUX_MUSL
+/nix/store/lgf2l2wkr5845485qw254skgc0bdvbnc-ruby-3.4.7/lib/ruby/3.4.0/rubygems/platform.rb:268: warning: previous definition of X64_LINUX_MUSL was here
+================================================================================
+RuboCop RSpec Guide - Cops Performance Benchmark
+================================================================================
+
+Mode: QUICK (fast feedback, ~1 minute)
+Tip: Use FULL_BENCHMARK=1 for more accurate measurements
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+MinimumBehavioralCoverage (with violation)
+                       220.000 i/100ms
+MinimumBehavioralCoverage (without violation)
+                       168.000 i/100ms
+Calculating -------------------------------------
+MinimumBehavioralCoverage (with violation)
+                          2.167k (± 2.0%) i/s  (461.40 μs/i) -      4.400k in   2.030998s
+MinimumBehavioralCoverage (without violation)
+                          1.649k (± 1.9%) i/s  (606.49 μs/i) -      3.360k in   2.038552s
+
+Comparison:
+MinimumBehavioralCoverage (with violation):     2167.3 i/s
+MinimumBehavioralCoverage (without violation):     1648.8 i/s - 1.31x  slower
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+HappyPathFirst (with violation)
+                       152.000 i/100ms
+HappyPathFirst (without violation)
+                       159.000 i/100ms
+Calculating -------------------------------------
+HappyPathFirst (with violation)
+                          1.507k (± 1.7%) i/s  (663.61 μs/i) -      3.040k in   2.017941s
+HappyPathFirst (without violation)
+                          1.643k (± 1.0%) i/s  (608.51 μs/i) -      3.339k in   2.032019s
+
+Comparison:
+HappyPathFirst (without violation):     1643.4 i/s
+HappyPathFirst (with violation):     1506.9 i/s - 1.09x  slower
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+ContextSetup (with violation)
+                       177.000 i/100ms
+ContextSetup (without violation)
+                       187.000 i/100ms
+Calculating -------------------------------------
+ContextSetup (with violation)
+                          1.775k (± 1.5%) i/s  (563.40 μs/i) -      3.717k in   2.094659s
+ContextSetup (without violation)
+                          1.894k (± 1.3%) i/s  (527.88 μs/i) -      3.927k in   2.073325s
+
+Comparison:
+ContextSetup (without violation):     1894.4 i/s
+ContextSetup (with violation):     1774.9 i/s - 1.07x  slower
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+DuplicateLetValues (with violation)
+                       120.000 i/100ms
+DuplicateLetValues (without violation)
+                       115.000 i/100ms
+Calculating -------------------------------------
+DuplicateLetValues (with violation)
+                          1.199k (± 1.3%) i/s  (834.28 μs/i) -      2.400k in   2.002646s
+DuplicateLetValues (without violation)
+                          1.177k (± 1.6%) i/s  (849.34 μs/i) -      2.415k in   2.051681s
+
+Comparison:
+DuplicateLetValues (with violation):     1198.6 i/s
+DuplicateLetValues (without violation):     1177.4 i/s - same-ish: difference falls within error
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+DuplicateBeforeHooks (with violation)
+                       125.000 i/100ms
+DuplicateBeforeHooks (without violation)
+                       151.000 i/100ms
+Calculating -------------------------------------
+DuplicateBeforeHooks (with violation)
+                          1.269k (± 1.2%) i/s  (787.73 μs/i) -      2.625k in   2.068076s
+DuplicateBeforeHooks (without violation)
+                          1.531k (± 2.2%) i/s  (653.27 μs/i) -      3.171k in   2.072556s
+
+Comparison:
+DuplicateBeforeHooks (without violation):     1530.8 i/s
+DuplicateBeforeHooks (with violation):     1269.5 i/s - 1.21x  slower
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+InvariantExamples (with violation)
+                        88.000 i/100ms
+InvariantExamples (without violation)
+                        83.000 i/100ms
+Calculating -------------------------------------
+InvariantExamples (with violation)
+                        881.991 (± 1.1%) i/s    (1.13 ms/i) -      1.848k in   2.095538s
+InvariantExamples (without violation)
+                        858.071 (± 1.6%) i/s    (1.17 ms/i) -      1.743k in   2.031829s
+
+Comparison:
+InvariantExamples (with violation):      882.0 i/s
+InvariantExamples (without violation):      858.1 i/s - same-ish: difference falls within error
+
+
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+DynamicAttributeEvaluation (with violation)
+                       250.000 i/100ms
+DynamicAttributeEvaluation (without violation)
+                       219.000 i/100ms
+Calculating -------------------------------------
+DynamicAttributeEvaluation (with violation)
+                          2.467k (± 1.0%) i/s  (405.35 μs/i) -      5.000k in   2.026967s
+DynamicAttributeEvaluation (without violation)
+                          2.194k (± 1.1%) i/s  (455.71 μs/i) -      4.599k in   2.096088s
+
+Comparison:
+DynamicAttributeEvaluation (with violation):     2467.0 i/s
+DynamicAttributeEvaluation (without violation):     2194.4 i/s - 1.12x  slower
+
+
+================================================================================
+Benchmark completed!
+================================================================================

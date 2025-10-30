@@ -59,7 +59,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::DuplicateBeforeHooks, :config do
 
   context "when WarnOnPartialDuplicates is disabled" do
     let(:config) do
-      RuboCop::Config.new(
+      rubocop_config_with_rspec_language(
         "RSpecGuide/DuplicateBeforeHooks" => {
           "WarnOnPartialDuplicates" => false
         }

@@ -3,7 +3,7 @@
 RSpec.describe RuboCop::Cop::RSpecGuide::InvariantExamples, :config do
   subject(:cop) { described_class.new(config) }
 
-  let(:config) { RuboCop::Config.new("RSpecGuide/InvariantExamples" => {"MinLeafContexts" => 3}) }
+  let(:config) { rubocop_config_with_rspec_language("RSpecGuide/InvariantExamples" => {"MinLeafContexts" => 3}) }
 
   context "when example repeats in all leaf contexts" do
     it "registers an offense for example repeated in all leaf contexts" do

@@ -85,7 +85,7 @@ module RuboCop
       #     end
       #   end
       #
-      class HappyPathFirst < Base
+      class HappyPathFirst < RuboCop::Cop::RSpec::Base
         MSG = "Place happy path contexts before corner cases. " \
               "First context appears to be a corner case: %<description>s"
 
@@ -95,6 +95,9 @@ module RuboCop
           fails missing absent unavailable
         ].freeze
 
+        # Using rubocop-rspec API: example_group?(node) from Base
+        # Custom matcher for context with description:
+
         # @!method context_with_description?(node)
         def_node_matcher :context_with_description?, <<~PATTERN
           (block
@@ -102,14 +105,9 @@ module RuboCop
             ...)
         PATTERN
 
-        # @!method example_group?(node)
-        def_node_matcher :example_group?, <<~PATTERN
-          (block
-            (send nil? {:describe :context} ...)
-            ...)
-        PATTERN
-
         def on_block(node)
+          # Fast pre-check: only process describe/context blocks
+          return unless node.method?(:describe) || node.method?(:context)
           return unless example_group?(node)
 
           contexts = collect_direct_child_contexts(node)

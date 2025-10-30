@@ -75,7 +75,7 @@ RSpec.describe RuboCop::Cop::RSpecGuide::DuplicateLetValues, :config do
 
   context "when WarnOnPartialDuplicates is disabled" do
     let(:config) do
-      RuboCop::Config.new(
+      rubocop_config_with_rspec_language(
         "RSpecGuide/DuplicateLetValues" => {
           "WarnOnPartialDuplicates" => false
         }

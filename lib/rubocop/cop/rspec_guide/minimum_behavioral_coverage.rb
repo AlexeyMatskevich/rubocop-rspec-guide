@@ -95,36 +95,31 @@ module RuboCop
       #     it { expect(subject.name).to eq('test') }
       #   end
       #
-      class MinimumBehavioralCoverage < Base
+      class MinimumBehavioralCoverage < RuboCop::Cop::RSpec::Base
         MSG = "Describe block should test at least 2 behavioral variations: " \
               "either use 2+ sibling contexts (happy path + edge cases), " \
               "or combine it-blocks for default behavior with context-blocks for edge cases. " \
               "Use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage` " \
               "for simple cases (e.g., getters) with no edge cases."
 
-        # @!method describe_block?(node)
-        def_node_matcher :describe_block?, <<~PATTERN
-          (block
-            (send nil? :describe ...)
-            ...)
-        PATTERN
+        # Using rubocop-rspec API matchers (inherited from RuboCop::Cop::RSpec::Base):
+        # - example_group?(node) - checks describe/context blocks
+        # - example?(node) - checks it/specify blocks
+        # Custom matcher for context-only:
 
-        # @!method context_block?(node)
-        def_node_matcher :context_block?, <<~PATTERN
+        # @!method context_only?(node)
+        def_node_matcher :context_only?, <<~PATTERN
           (block (send nil? :context ...) ...)
         PATTERN
 
-        # @!method it_block?(node)
-        def_node_matcher :it_block?, <<~PATTERN
-          (block (send nil? :it ...) ...)
-        PATTERN
-
         def on_block(node)
-          return unless describe_block?(node)
+          # Fast pre-check: only process describe blocks (not context)
+          return unless node.method?(:describe)
+          return unless example_group?(node)
 
           children = collect_children(node)
-          contexts = children.select { |child| context_block?(child) }
-          its = children.select { |child| it_block?(child) }
+          contexts = children.select { |child| context_only?(child) }
+          its = children.select { |child| example?(child) }
 
           # Valid if: 2+ contexts OR (1+ it-blocks before contexts AND 1+ contexts)
           return if contexts.size >= 2
@@ -158,8 +153,8 @@ module RuboCop
           return false if its.empty? || contexts.empty?
 
           # Find positions of first it-block and first context-block
-          first_it_index = children.index { |child| it_block?(child) }
-          first_context_index = children.index { |child| context_block?(child) }
+          first_it_index = children.index { |child| example?(child) }
+          first_context_index = children.index { |child| context_only?(child) }
 
           # All it-blocks must come before all context-blocks
           first_it_index < first_context_index

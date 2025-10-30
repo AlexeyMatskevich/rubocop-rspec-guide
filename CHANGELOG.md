@@ -1,5 +1,42 @@
 ## [Unreleased]
 
+## [0.4.0] - 2025-10-30
+
+### Added
+- **Integration with RuboCop::Cop::RSpec::Base**: All 6 RSpec cops now inherit from `RuboCop::Cop::RSpec::Base`
+  - Leverages rubocop-rspec Language API for better RSpec DSL detection
+  - Native support for `let_it_be` and `let_it_be!` from rspec-rails
+  - More accurate detection of RSpec constructs
+- **RSpec Language configuration**: Added comprehensive RSpec/Language config in `config/default.yml`
+  - Enables rubocop-rspec API matchers: `example_group?()`, `example?()`, `let?()`, `hook?()`
+  - Supports ExampleGroups, Examples, Helpers, Hooks, and Subjects
+- **Configuration injection**: Created `lib/rubocop/rspec/guide/inject.rb` to automatically load gem config
+- **Test helper improvements**: Added `rubocop_config_with_rspec_language` helper for consistent test setup
+
+### Changed
+- **Removed duplicate node matchers**: Eliminated ~30 lines of code that duplicated rubocop-rspec functionality
+  - `example_group?()` - now uses API instead of custom matcher
+  - `example?()` - now uses API instead of custom matcher  
+  - `let?()` - now uses API (also recognizes let_it_be/let_it_be!)
+  - `hook?()` - now uses API instead of custom matcher
+- **Kept strategic custom matchers**: Retained specific matchers where needed
+  - `context_only?()` - for filtering only context blocks
+  - `let_with_name_and_value?()` - captures let name and value
+  - `before_hook_with_body?()` - captures hook body
+  - `example_with_description?()` - captures example description
+
+### Performance
+- **Optimized for production use**: Applied two-level optimization strategy
+  - Fast pre-checks: Added `node.method?(:describe)` checks before API calls
+  - Local matchers for hot paths: InvariantExamples uses fast local matching in O(n²) loops
+- **InvariantExamples**: **4.25x faster** than v0.3.1 baseline (1,504 → 6,395 i/s) 🚀
+- **Other cops**: 10-25% slower than baseline, acceptable trade-off for correctness and maintainability
+- **Real-world impact**: All cops remain fast enough for CI/CD pipelines (1,200-6,395 i/s)
+- **Detailed analysis**: See `PERFORMANCE_REPORT.md` for comprehensive performance documentation
+
+### Fixed
+- **ContextSetup**: Now correctly recognizes `let_it_be` and `let_it_be!` as valid context setup
+
 ## [0.3.1] - 2025-10-30
 
 ### Added
