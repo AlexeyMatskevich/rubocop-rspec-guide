@@ -4,10 +4,21 @@ module RuboCop
   module Cop
     module RSpecGuide
       # Detects examples that repeat in all leaf contexts.
-      # These invariants should be extracted to shared_examples.
       #
-      # @example
-      #   # bad
+      # When the same test appears in all leaf contexts, it indicates an invariant -
+      # a property that holds true regardless of the context. These invariants represent
+      # interface contracts and should be extracted to shared_examples for reusability
+      # and clarity.
+      #
+      # The cop only reports when examples appear in MinLeafContexts or more contexts
+      # (default: 3) to avoid false positives.
+      #
+      # @safety
+      #   This cop is safe to run automatically. It compares example descriptions
+      #   for exact string matches.
+      #
+      # @example Bad - repeated invariant
+      #   # bad - 'responds to valid?' repeated in all 3 contexts
       #   describe 'Validator' do
       #     context 'with valid data' do
       #       it 'responds to valid?' do
@@ -28,7 +39,8 @@ module RuboCop
       #     end
       #   end
       #
-      #   # good
+      # @example Good - extracted to shared_examples
+      #   # good - invariant extracted to shared_examples
       #   shared_examples 'a validator' do
       #     it 'responds to valid?' do
       #       expect(subject).to respond_to(:valid?)
@@ -38,14 +50,43 @@ module RuboCop
       #   describe 'Validator' do
       #     context 'with valid data' do
       #       it_behaves_like 'a validator'
+      #       it { expect(subject.valid?).to be true }
       #     end
       #
       #     context 'with invalid data' do
       #       it_behaves_like 'a validator'
+      #       it { expect(subject.valid?).to be false }
       #     end
       #
       #     context 'with empty data' do
       #       it_behaves_like 'a validator'
+      #       it { expect(subject.valid?).to be false }
+      #     end
+      #   end
+      #
+      # @example Configuration
+      #   # Adjust minimum contexts threshold:
+      #   RSpecGuide/InvariantExamples:
+      #     MinLeafContexts: 3  # Default: report if in 3+ contexts
+      #
+      #   # For larger test suites, use higher threshold:
+      #   RSpecGuide/InvariantExamples:
+      #     MinLeafContexts: 5  # Only report if in 5+ contexts
+      #
+      # @example Edge case - not in all contexts
+      #   # good - test only in 2 out of 3 contexts (not invariant)
+      #   describe 'Calculator' do
+      #     context 'with addition' do
+      #       it 'returns numeric' { expect(result).to be_a(Numeric) }
+      #     end
+      #
+      #     context 'with subtraction' do
+      #       it 'returns numeric' { expect(result).to be_a(Numeric) }
+      #     end
+      #
+      #     context 'with division by zero' do
+      #       it 'raises error' { expect { result }.to raise_error }
+      #       # 'returns numeric' not here - not an invariant
       #     end
       #   end
       #

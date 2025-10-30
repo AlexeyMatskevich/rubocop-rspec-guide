@@ -4,51 +4,84 @@ module RuboCop
   module Cop
     module RSpecGuide
       # Checks that corner cases are not the first context in a describe block.
-      # Happy path should come first for better readability.
+      #
+      # Placing happy path scenarios first improves test readability by establishing
+      # the expected behavior before diving into edge cases. This makes it easier for
+      # readers to understand the primary purpose of the code being tested.
       #
       # The cop allows corner case contexts to appear first if there are
       # example blocks (it/specify) before the first context, as those examples
       # represent the happy path.
       #
-      # @example
-      #   # bad
+      # @safety
+      #   This cop is safe to run automatically. It detects corner case indicators
+      #   like 'but', 'however', 'not', 'without', 'except', etc.
+      #
+      # @example Bad - corner case first
+      #   # bad - starts with negative case
       #   describe '#process' do
       #     context 'but user is blocked' do
-      #       # ...
+      #       it { expect { process }.to raise_error }
       #     end
+      #
       #     context 'when user is valid' do
-      #       # ...
+      #       it { expect(process).to be_success }
       #     end
       #   end
       #
-      #   # bad
+      #   # bad - starts with NOT condition
       #   describe '#activate' do
       #     context 'when user does NOT exist' do
-      #       # ...
+      #       it { expect { activate }.to raise_error(NotFound) }
       #     end
+      #
       #     context 'when user exists' do
-      #       # ...
+      #       it { expect(activate).to be_truthy }
       #     end
       #   end
       #
-      #   # good
+      # @example Good - happy path first
+      #   # good - happy path comes first
       #   describe '#subscribe' do
       #     context 'with valid card' do
-      #       # ...
+      #       it { expect(subscribe).to be_success }
       #     end
+      #
       #     context 'but payment fails' do
-      #       # ...
+      #       it { expect(subscribe).to be_failure }
       #     end
       #   end
       #
+      #   # good - positive case before negative
+      #   describe '#send_notification' do
+      #     context 'when user has email' do
+      #       it { expect(send_notification).to be_sent }
+      #     end
+      #
+      #     context 'without email' do
+      #       it { expect(send_notification).to be_skipped }
+      #     end
+      #   end
+      #
+      # @example Edge case - it-blocks represent happy path
       #   # good - examples before first context represent happy path
       #   describe '#add_child' do
       #     it 'adds child to children collection' do
-      #       # ...
+      #       expect { add_child(child) }.to change(parent.children, :count).by(1)
       #     end
       #
       #     context 'but child is already in collection' do
-      #       # ...
+      #       it { expect { add_child(child) }.not_to change(parent.children, :count) }
+      #     end
+      #   end
+      #
+      #   # good - multiple it-blocks as happy path
+      #   describe '#calculate' do
+      #     it { expect(calculate).to be_a(Numeric) }
+      #     it { expect(calculate).to be_positive }
+      #
+      #     context 'with invalid input' do
+      #       it { expect { calculate }.to raise_error }
       #     end
       #   end
       #

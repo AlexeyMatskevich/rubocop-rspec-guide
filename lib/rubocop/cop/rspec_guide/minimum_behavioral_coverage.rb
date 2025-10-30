@@ -5,53 +5,94 @@ module RuboCop
     module RSpecGuide
       # Checks that describe blocks test at least 2 behavioral variations.
       #
+      # Testing only a single scenario (happy path OR edge case) provides
+      # insufficient coverage. Tests should verify both expected behavior
+      # and edge case handling to ensure comprehensive validation.
+      #
       # This can be achieved in two ways:
       # 1. Use 2+ sibling context blocks (happy path + edge cases)
       # 2. Combine it-blocks (default behavior) with context-blocks (edge cases)
       #
-      # @example
-      #   # bad - only one variation
-      #   describe '#process' do
-      #     it 'works' do
-      #       expect(subject.process).to be_success
+      # @safety
+      #   This cop is safe to run automatically. For simple methods like getters
+      #   with no edge cases, use `# rubocop:disable RSpecGuide/MinimumBehavioralCoverage`
+      #
+      # @example Traditional approach - 2+ sibling contexts
+      #   # bad - only one scenario (no edge case testing)
+      #   describe '#calculate' do
+      #     context 'with valid data' do
+      #       it { expect(result).to eq(100) }
       #     end
       #   end
       #
-      #   # bad - only one variation
-      #   describe '#process' do
-      #     context 'when data is valid' do
-      #       it 'processes' do
-      #         expect(subject.process).to be_success
-      #       end
+      #   # good - multiple scenarios (happy path + edge cases)
+      #   describe '#calculate' do
+      #     context 'with valid data' do
+      #       it { expect(result).to eq(100) }
+      #     end
+      #
+      #     context 'with invalid data' do
+      #       it { expect { result }.to raise_error(ValidationError) }
       #     end
       #   end
       #
-      #   # good - 2+ sibling contexts
-      #   describe '#process' do
-      #     context 'when data is valid' do
-      #       it 'processes successfully' do
-      #         expect(subject.process).to be_success
-      #       end
+      #   # good - more comprehensive coverage
+      #   describe '#calculate' do
+      #     context 'with positive numbers' do
+      #       it { expect(result).to eq(100) }
       #     end
       #
-      #     context 'when data is invalid' do
-      #       it 'returns error' do
-      #         expect(subject.process).to be_error
-      #       end
+      #     context 'with zero' do
+      #       it { expect(result).to eq(0) }
+      #     end
+      #
+      #     context 'with negative numbers' do
+      #       it { expect { result }.to raise_error(ArgumentError) }
       #     end
       #   end
       #
-      #   # good - it-blocks + context-blocks
-      #   describe '#process' do
-      #     it 'processes with defaults' do
-      #       expect(subject.process).to be_success
-      #     end
+      # @example New pattern - it-blocks + context-blocks
+      #   # bad - only default behavior, no edge cases
+      #   describe '#calculate' do
+      #     it 'calculates sum' { expect(result).to eq(100) }
+      #   end
       #
-      #     context 'when data is invalid' do
-      #       it 'returns error' do
-      #         expect(subject.process).to be_error
-      #       end
+      #   # good - default behavior + edge case
+      #   describe '#calculate' do
+      #     it 'calculates sum with defaults' { expect(result).to eq(100) }
+      #
+      #     context 'with invalid input' do
+      #       it { expect { result }.to raise_error(ValidationError) }
       #     end
+      #   end
+      #
+      #   # good - multiple it-blocks for defaults, context for edge case
+      #   describe '#calculate' do
+      #     it 'returns numeric result' { expect(result).to be_a(Numeric) }
+      #     it 'is positive' { expect(result).to be > 0 }
+      #
+      #     context 'with special conditions' do
+      #       it { expect(result).to eq(0) }
+      #     end
+      #   end
+      #
+      # @example Edge case - setup before tests (allowed)
+      #   # good - setup + it-blocks + contexts
+      #   describe '#calculate' do
+      #     let(:calculator) { Calculator.new }
+      #     before { calculator.configure }
+      #
+      #     it 'works with defaults' { expect(result).to eq(100) }
+      #
+      #     context 'with custom config' do
+      #       it { expect(result).to eq(200) }
+      #     end
+      #   end
+      #
+      # @example When to disable this cop
+      #   # Simple getter with no edge cases - disable is acceptable
+      #   describe '#name' do # rubocop:disable RSpecGuide/MinimumBehavioralCoverage
+      #     it { expect(subject.name).to eq('test') }
       #   end
       #
       class MinimumBehavioralCoverage < Base

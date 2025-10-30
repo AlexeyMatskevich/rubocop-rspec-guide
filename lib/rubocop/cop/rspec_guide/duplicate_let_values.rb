@@ -3,11 +3,19 @@
 module RuboCop
   module Cop
     module RSpecGuide
-      # Detects duplicate let declarations with identical values across all sibling contexts.
-      # These should be extracted to the parent context.
+      # Detects duplicate let declarations with identical values across sibling contexts.
       #
-      # @example
-      #   # bad
+      # When the same let with the same value appears in multiple sibling contexts,
+      # it indicates one of two problems:
+      # 1. ERROR: Duplicate in ALL contexts → must extract to parent
+      # 2. WARNING: Duplicate in SOME contexts → suggests poor test hierarchy
+      #
+      # @safety
+      #   This cop is safe to run automatically. It only detects duplicates,
+      #   not semantic issues.
+      #
+      # @example ERROR - duplicate in ALL contexts
+      #   # bad - let(:currency) duplicated in all 2 contexts
       #   describe 'Calculator' do
       #     context 'with addition' do
       #       let(:currency) { :usd }
@@ -15,14 +23,14 @@ module RuboCop
       #     end
       #
       #     context 'with subtraction' do
-      #       let(:currency) { :usd }  # Duplicate!
+      #       let(:currency) { :usd }  # ERROR: in all contexts!
       #       it { expect(result).to eq(5) }
       #     end
       #   end
       #
-      #   # good
+      #   # good - extracted to parent
       #   describe 'Calculator' do
-      #     let(:currency) { :usd }  # Extracted to parent
+      #     let(:currency) { :usd }  # Moved to parent
       #
       #     context 'with addition' do
       #       it { expect(result).to eq(10) }
@@ -30,6 +38,67 @@ module RuboCop
       #
       #     context 'with subtraction' do
       #       it { expect(result).to eq(5) }
+      #     end
+      #   end
+      #
+      # @example WARNING - duplicate in SOME contexts
+      #   # bad - let(:mode) duplicated in 2/3 contexts (code smell)
+      #   describe 'Processor' do
+      #     context 'scenario A' do
+      #       let(:mode) { :standard }
+      #       it { expect(result).to eq('A') }
+      #     end
+      #
+      #     context 'scenario B' do
+      #       let(:mode) { :standard }  # WARNING: duplicated in 2/3
+      #       it { expect(result).to eq('B') }
+      #     end
+      #
+      #     context 'scenario C' do
+      #       let(:mode) { :advanced }  # Different value
+      #       it { expect(result).to eq('C') }
+      #     end
+      #   end
+      #
+      #   # good - refactor hierarchy
+      #   describe 'Processor' do
+      #     context 'with standard mode' do
+      #       let(:mode) { :standard }
+      #
+      #       context 'scenario A' do
+      #         it { expect(result).to eq('A') }
+      #       end
+      #
+      #       context 'scenario B' do
+      #         it { expect(result).to eq('B') }
+      #       end
+      #     end
+      #
+      #     context 'with advanced mode' do
+      #       let(:mode) { :advanced }
+      #
+      #       context 'scenario C' do
+      #         it { expect(result).to eq('C') }
+      #       end
+      #     end
+      #   end
+      #
+      # @example Configuration
+      #   # To disable warnings for partial duplicates:
+      #   RSpecGuide/DuplicateLetValues:
+      #     WarnOnPartialDuplicates: false  # Only report full duplicates
+      #
+      # @example Edge case - different values
+      #   # good - same let name but different values (no duplicate)
+      #   describe 'Converter' do
+      #     context 'to USD' do
+      #       let(:currency) { :usd }
+      #       it { expect(convert).to eq(100) }
+      #     end
+      #
+      #     context 'to EUR' do
+      #       let(:currency) { :eur }  # Different value, OK
+      #       it { expect(convert).to eq(85) }
       #     end
       #   end
       #

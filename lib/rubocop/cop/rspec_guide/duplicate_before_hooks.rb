@@ -3,11 +3,19 @@
 module RuboCop
   module Cop
     module RSpecGuide
-      # Detects duplicate before hooks with identical code across all sibling contexts.
-      # These should be extracted to the parent context.
+      # Detects duplicate before hooks with identical code across sibling contexts.
       #
-      # @example
-      #   # bad
+      # When the same before hook appears in multiple sibling contexts,
+      # it indicates one of two problems:
+      # 1. ERROR: Duplicate in ALL contexts → must extract to parent
+      # 2. WARNING: Duplicate in SOME contexts → suggests poor test hierarchy
+      #
+      # @safety
+      #   This cop is safe to run automatically. It compares hook bodies for
+      #   exact matches, not semantic equivalence.
+      #
+      # @example ERROR - duplicate in ALL contexts
+      #   # bad - before hook duplicated in all 2 contexts
       #   describe 'Controller' do
       #     context 'as admin' do
       #       before { sign_in(user) }
@@ -15,14 +23,14 @@ module RuboCop
       #     end
       #
       #     context 'as guest' do
-      #       before { sign_in(user) }  # Duplicate!
+      #       before { sign_in(user) }  # ERROR: in all contexts!
       #       it { expect(response).to be_forbidden }
       #     end
       #   end
       #
-      #   # good
+      #   # good - extracted to parent
       #   describe 'Controller' do
-      #     before { sign_in(user) }  # Extracted to parent
+      #     before { sign_in(user) }  # Moved to parent
       #
       #     context 'as admin' do
       #       it { expect(response).to be_successful }
@@ -30,6 +38,67 @@ module RuboCop
       #
       #     context 'as guest' do
       #       it { expect(response).to be_forbidden }
+      #     end
+      #   end
+      #
+      # @example WARNING - duplicate in SOME contexts
+      #   # bad - before hook duplicated in 2/3 contexts (code smell)
+      #   describe 'API' do
+      #     context 'scenario A' do
+      #       before { setup_api }
+      #       it { expect(response).to be_ok }
+      #     end
+      #
+      #     context 'scenario B' do
+      #       before { setup_api }  # WARNING: duplicated in 2/3
+      #       it { expect(response).to be_ok }
+      #     end
+      #
+      #     context 'scenario C' do
+      #       before { setup_different_api }  # Different setup
+      #       it { expect(response).to be_ok }
+      #     end
+      #   end
+      #
+      #   # good - refactor hierarchy
+      #   describe 'API' do
+      #     context 'with standard setup' do
+      #       before { setup_api }
+      #
+      #       context 'scenario A' do
+      #         it { expect(response).to be_ok }
+      #       end
+      #
+      #       context 'scenario B' do
+      #         it { expect(response).to be_ok }
+      #       end
+      #     end
+      #
+      #     context 'with different setup' do
+      #       before { setup_different_api }
+      #
+      #       context 'scenario C' do
+      #         it { expect(response).to be_ok }
+      #       end
+      #     end
+      #   end
+      #
+      # @example Configuration
+      #   # To disable warnings for partial duplicates:
+      #   RSpecGuide/DuplicateBeforeHooks:
+      #     WarnOnPartialDuplicates: false  # Only report full duplicates
+      #
+      # @example Edge case - different hooks
+      #   # good - different before hooks (no duplicate)
+      #   describe 'Service' do
+      #     context 'with user A' do
+      #       before { sign_in(user_a) }
+      #       it { expect(service.call).to be_success }
+      #     end
+      #
+      #     context 'with user B' do
+      #       before { sign_in(user_b) }  # Different, OK
+      #       it { expect(service.call).to be_success }
       #     end
       #   end
       #

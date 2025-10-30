@@ -7,27 +7,85 @@ module RuboCop
       # are wrapped in blocks for dynamic evaluation.
       #
       # Without blocks, method calls are evaluated once at factory definition time,
-      # not at factory instantiation time. This is particularly problematic for:
+      # not at factory instantiation time. This causes all factory instances to share
+      # the same value, leading to subtle bugs and test pollution.
+      #
+      # This is particularly problematic for:
       # - Time-related methods (Time.now, Date.today, 1.day.from_now, etc.)
       # - Random values (SecureRandom.hex, SecureRandom.uuid, etc.)
-      # - Any other method calls that should return different values per instance
+      # - Object constructors (Array.new, Hash.new, etc.)
+      # - Any method calls that should return different values per instance
       #
-      # @example
-      #   # bad - evaluated once at factory load time
+      # @safety
+      #   This cop is safe to run automatically. It detects all method calls
+      #   in factory attributes, not just Time/Random methods.
+      #
+      # @example Time-related methods
+      #   # bad - all users get the same timestamp
       #   factory :user do
-      #     created_at Time.now              # Same timestamp for all users!
-      #     token SecureRandom.hex           # Same token for all users!
-      #     expires_at 1.day.from_now        # Same expiry for all users!
-      #     tags Array.new                   # Same array instance shared!
+      #     created_at Time.now
+      #     updated_at DateTime.now
+      #     birth_date Date.today
+      #     expires_at 1.day.from_now
       #   end
       #
-      #   # good - evaluated dynamically for each instance
+      #   # good - each user gets a fresh timestamp
       #   factory :user do
       #     created_at { Time.now }
-      #     token { SecureRandom.hex }
+      #     updated_at { DateTime.now }
+      #     birth_date { Date.today }
       #     expires_at { 1.day.from_now }
+      #   end
+      #
+      # @example Random values
+      #   # bad - all users share the same token
+      #   factory :user do
+      #     token SecureRandom.hex
+      #     uuid SecureRandom.uuid
+      #   end
+      #
+      #   # good - each user gets a unique token
+      #   factory :user do
+      #     token { SecureRandom.hex }
+      #     uuid { SecureRandom.uuid }
+      #   end
+      #
+      # @example Object constructors
+      #   # bad - all users share the same array/hash instance!
+      #   factory :user do
+      #     tags Array.new
+      #     metadata Hash.new
+      #   end
+      #
+      #   # This causes test pollution:
+      #   user1 = create(:user)
+      #   user1.tags << 'admin'
+      #   user2 = create(:user)
+      #   user2.tags # => ['admin'] - unexpected!
+      #
+      #   # good - each user gets a new array/hash
+      #   factory :user do
       #     tags { Array.new }
-      #     name "John"                      # Static values are OK
+      #     metadata { Hash.new }
+      #   end
+      #
+      # @example Static values (no block needed)
+      #   # good - static values don't need blocks
+      #   factory :user do
+      #     name "John Doe"
+      #     age 30
+      #     active true
+      #   end
+      #
+      # @example Complex expressions
+      #   # bad - method chains evaluated once
+      #   factory :user do
+      #     full_name current_user.profile.display_name
+      #   end
+      #
+      #   # good - method chains evaluated per instance
+      #   factory :user do
+      #     full_name { current_user.profile.display_name }
       #   end
       #
       class DynamicAttributeEvaluation < Base
