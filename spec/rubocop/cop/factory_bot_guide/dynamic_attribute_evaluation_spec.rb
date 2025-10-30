@@ -148,4 +148,117 @@ RSpec.describe RuboCop::Cop::FactoryBotGuide::DynamicAttributeEvaluation, :confi
       RUBY
     end
   end
+
+  describe "autocorrection" do
+    context "with Time.now" do
+      it "wraps the value in a block" do
+        expect_offense(<<~RUBY)
+          factory :user do
+            created_at Time.now
+            ^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `created_at` because `Time.now` is evaluated once at factory definition time. Wrap in block: `created_at { Time.now }`
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          factory :user do
+            created_at { Time.now }
+          end
+        RUBY
+      end
+    end
+
+    context "with SecureRandom.hex" do
+      it "wraps the value in a block" do
+        expect_offense(<<~RUBY)
+          factory :user do
+            token SecureRandom.hex
+            ^^^^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `token` because `SecureRandom.hex` is evaluated once at factory definition time. Wrap in block: `token { SecureRandom.hex }`
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          factory :user do
+            token { SecureRandom.hex }
+          end
+        RUBY
+      end
+    end
+
+    context "with method chain like 1.day.from_now" do
+      it "wraps the entire chain in a block" do
+        expect_offense(<<~RUBY)
+          factory :order do
+            expires_at 1.day.from_now
+            ^^^^^^^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `expires_at` because `1.day.from_now` is evaluated once at factory definition time. Wrap in block: `expires_at { 1.day.from_now }`
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          factory :order do
+            expires_at { 1.day.from_now }
+          end
+        RUBY
+      end
+    end
+
+    context "with Array.new" do
+      it "wraps the constructor call in a block" do
+        expect_offense(<<~RUBY)
+          factory :user do
+            tags Array.new
+            ^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `tags` because `Array.new` is evaluated once at factory definition time. Wrap in block: `tags { Array.new }`
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          factory :user do
+            tags { Array.new }
+          end
+        RUBY
+      end
+    end
+
+    context "with multiple violations" do
+      it "corrects all violations" do
+        expect_offense(<<~RUBY)
+          factory :user do
+            created_at Time.now
+            ^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `created_at` because `Time.now` is evaluated once at factory definition time. Wrap in block: `created_at { Time.now }`
+            token SecureRandom.hex
+            ^^^^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `token` because `SecureRandom.hex` is evaluated once at factory definition time. Wrap in block: `token { SecureRandom.hex }`
+            name "John"
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          factory :user do
+            created_at { Time.now }
+            token { SecureRandom.hex }
+            name "John"
+          end
+        RUBY
+      end
+    end
+
+    context "with FactoryBot prefix" do
+      it "corrects violations in FactoryBot.define" do
+        expect_offense(<<~RUBY)
+          FactoryBot.define do
+            factory :user do
+              created_at Time.now
+              ^^^^^^^^^^^^^^^^^^^ FactoryBotGuide/DynamicAttributeEvaluation: Use block syntax for attribute `created_at` because `Time.now` is evaluated once at factory definition time. Wrap in block: `created_at { Time.now }`
+            end
+          end
+        RUBY
+
+        expect_correction(<<~RUBY)
+          FactoryBot.define do
+            factory :user do
+              created_at { Time.now }
+            end
+          end
+        RUBY
+      end
+    end
+  end
 end

@@ -89,6 +89,8 @@ module RuboCop
       #   end
       #
       class DynamicAttributeEvaluation < Base
+        extend AutoCorrector
+
         MSG = "Use block syntax for attribute `%<attribute>s` because `%<method>s` " \
               "is evaluated once at factory definition time. " \
               "Wrap in block: `%<attribute>s { %<value>s }`"
@@ -135,7 +137,10 @@ module RuboCop
                 method: method_description(value),
                 value: value.source
               )
-            )
+            ) do |corrector|
+              # Wrap the value in a block: value -> { value }
+              corrector.replace(value, "{ #{value.source} }")
+            end
           end
         end
 

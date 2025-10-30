@@ -66,7 +66,39 @@ gem install rubocop-rspec-guide
 5. **Fix offenses automatically (where possible):**
    ```bash
    bundle exec rubocop -a
+   # or for safe autocorrection only:
+   bundle exec rubocop -A
    ```
+
+### Autocorrection Support
+
+Some cops support **automatic correction** with `rubocop -a`:
+
+| Cop | Autocorrect | Safety |
+|-----|-------------|--------|
+| `FactoryBotGuide/DynamicAttributeEvaluation` | ✅ Yes | Safe |
+| `RSpecGuide/MinimumBehavioralCoverage` | ❌ No | - |
+| `RSpecGuide/HappyPathFirst` | ❌ No | - |
+| `RSpecGuide/ContextSetup` | ❌ No | - |
+| `RSpecGuide/DuplicateLetValues` | ❌ No | - |
+| `RSpecGuide/DuplicateBeforeHooks` | ❌ No | - |
+| `RSpecGuide/InvariantExamples` | ❌ No | - |
+
+**Example of autocorrection:**
+
+```ruby
+# Before: offense detected
+factory :user do
+  created_at Time.now
+  token SecureRandom.hex
+end
+
+# After: rubocop -a
+factory :user do
+  created_at { Time.now }
+  token { SecureRandom.hex }
+end
+```
 
 ### Common Patterns
 
