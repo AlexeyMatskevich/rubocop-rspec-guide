@@ -9,3 +9,9 @@
 /.devbox/
 # rspec failure tracking
 .rspec_status
+
+# Internal planning and notes (Russian text, not for commit)
+IMPROVEMENTS_PLAN.md
+IMPROVEMENTS_SUMMARY.md
+*.plan.md
+*.notes.md
