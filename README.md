@@ -187,10 +187,59 @@ end
 
 ### Configuration Examples
 
+#### Complete Setup (with rubocop-rspec and rubocop-factory_bot)
+
+Most projects use `rubocop-rspec-guide` alongside `rubocop-rspec` and `rubocop-factory_bot`. Here's a complete configuration:
+
+```yaml
+# .rubocop.yml
+
+# Load all RSpec-related extensions
+require:
+  - rubocop-rspec
+  - rubocop-rspec_rails  # If using Rails
+  - rubocop-factory_bot
+  - rubocop-rspec-guide
+
+# Or use plugins syntax (RuboCop 1.72+):
+# plugins:
+#   - rubocop-rspec
+#   - rubocop-rspec_rails
+#   - rubocop-factory_bot
+#   - rubocop-rspec-guide
+
+# RSpec cops (from rubocop-rspec)
+RSpec/VerifiedDoubles:
+  Enabled: true
+
+RSpec/MessageSpies:
+  Enabled: true
+  EnforcedStyle: have_received
+
+# FactoryBot cops (from rubocop-factory_bot)
+FactoryBot/CreateList:
+  Enabled: true
+
+# RSpec Style Guide cops (from rubocop-rspec-guide)
+RSpecGuide/MinimumBehavioralCoverage:
+  Enabled: true
+
+RSpecGuide/HappyPathFirst:
+  Enabled: true
+
+RSpecGuide/ContextSetup:
+  Enabled: true
+
+FactoryBotGuide/DynamicAttributeEvaluation:
+  Enabled: true
+```
+
+**Note:** The gem automatically injects RSpec Language configuration (v0.4.0+), so no `inherit_gem` is needed.
+
 #### Strict Mode (for new projects)
 
 ```yaml
-plugins:
+require:
   - rubocop-rspec-guide
 
 RSpecGuide/MinimumBehavioralCoverage:
@@ -221,7 +270,7 @@ FactoryBotGuide/DynamicAttributeEvaluation:
 #### Relaxed Mode (for legacy projects)
 
 ```yaml
-plugins:
+require:
   - rubocop-rspec-guide
 
 # Enable only critical cops
