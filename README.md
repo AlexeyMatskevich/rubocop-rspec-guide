@@ -24,48 +24,134 @@ gem install rubocop-rspec-guide
 
 ## Usage
 
-### Modern Approach (RuboCop 1.72+)
+### Quick Start
 
-Add to your `.rubocop.yml`:
+1. **Add to Gemfile:**
+   ```ruby
+   group :development, :test do
+     gem 'rubocop-rspec-guide', require: false
+   end
+   ```
 
-```yaml
-# Modern plugin system (recommended for RuboCop 1.72+)
-plugins:
-  - rubocop-rspec-guide
+2. **Install:**
+   ```bash
+   bundle install
+   ```
 
-# Optionally inherit the default config
-inherit_gem:
-  rubocop-rspec-guide: config/default.yml
+3. **Configure `.rubocop.yml`:**
+   
+   **Modern approach (RuboCop 1.72+):**
+   ```yaml
+   plugins:
+     - rubocop-rspec-guide
+   
+   inherit_gem:
+     rubocop-rspec-guide: config/default.yml
+   ```
+   
+   **Legacy approach (RuboCop < 1.72):**
+   ```yaml
+   require:
+     - rubocop-rspec-guide
+   
+   inherit_gem:
+     rubocop-rspec-guide: config/default.yml
+   ```
 
-# Recommended: Enable RSpec/LeadingSubject to ensure subject is at describe level
-RSpec/LeadingSubject:
-  Enabled: true
+4. **Run RuboCop:**
+   ```bash
+   bundle exec rubocop
+   ```
+
+5. **Fix offenses automatically (where possible):**
+   ```bash
+   bundle exec rubocop -a
+   ```
+
+### Common Patterns
+
+#### Pattern 1: Testing Happy Path + Edge Cases
+
+```ruby
+# Before (offense)
+describe '#calculate_discount' do
+  it 'calculates discount' do
+    expect(calculate_discount(100)).to eq(10)
+  end
+end
+
+# After (fixed)
+describe '#calculate_discount' do
+  context 'with standard price' do
+    it { expect(calculate_discount(100)).to eq(10) }
+  end
+
+  context 'with zero price' do
+    it { expect(calculate_discount(0)).to eq(0) }
+  end
+
+  context 'with negative price' do
+    it { expect { calculate_discount(-10) }.to raise_error(ArgumentError) }
+  end
+end
 ```
 
-### Legacy Approach (RuboCop < 1.72)
+#### Pattern 2: It-blocks + Context-blocks
 
-For older versions of RuboCop, use `require:` instead:
+```ruby
+# Good - default behavior + edge cases
+describe '#process_payment' do
+  it 'processes payment successfully' do
+    expect(process_payment).to be_success
+  end
 
-```yaml
-# Legacy require system (for RuboCop < 1.72)
-require:
-  - rubocop-rspec-guide
+  context 'when payment gateway is down' do
+    before { stub_gateway_down }
+    it { expect(process_payment).to be_failure }
+  end
 
-# Optionally inherit the default config
-inherit_gem:
-  rubocop-rspec-guide: config/default.yml
-
-# Recommended: Enable RSpec/LeadingSubject to ensure subject is at describe level
-RSpec/LeadingSubject:
-  Enabled: true
+  context 'with insufficient funds' do
+    let(:balance) { 0 }
+    it { expect(process_payment).to be_declined }
+  end
+end
 ```
 
-### Individual Configuration
+#### Pattern 3: Extracting Duplicate Setup
 
-Configure cops individually with either approach:
+```ruby
+# Before (offense - duplicate let in all contexts)
+describe 'PaymentProcessor' do
+  context 'with credit card' do
+    let(:currency) { :usd }
+    it { expect(process).to be_success }
+  end
+
+  context 'with paypal' do
+    let(:currency) { :usd }  # Duplicate!
+    it { expect(process).to be_success }
+  end
+end
+
+# After (fixed - extracted to parent)
+describe 'PaymentProcessor' do
+  let(:currency) { :usd }  # Moved to parent
+
+  context 'with credit card' do
+    it { expect(process).to be_success }
+  end
+
+  context 'with paypal' do
+    it { expect(process).to be_success }
+  end
+end
+```
+
+### Configuration Examples
+
+#### Strict Mode (for new projects)
 
 ```yaml
-# Use 'plugins:' (RuboCop 1.72+) or 'require:' (older versions)
 plugins:
   - rubocop-rspec-guide
 
@@ -80,9 +166,11 @@ RSpecGuide/ContextSetup:
 
 RSpecGuide/DuplicateLetValues:
   Enabled: true
+  WarnOnPartialDuplicates: true
 
 RSpecGuide/DuplicateBeforeHooks:
   Enabled: true
+  WarnOnPartialDuplicates: true
 
 RSpecGuide/InvariantExamples:
   Enabled: true
@@ -91,6 +179,154 @@ RSpecGuide/InvariantExamples:
 FactoryBotGuide/DynamicAttributeEvaluation:
   Enabled: true
 ```
+
+#### Relaxed Mode (for legacy projects)
+
+```yaml
+plugins:
+  - rubocop-rspec-guide
+
+# Enable only critical cops
+RSpecGuide/MinimumBehavioralCoverage:
+  Enabled: true
+
+RSpecGuide/ContextSetup:
+  Enabled: true
+
+# Disable warnings for partial duplicates
+RSpecGuide/DuplicateLetValues:
+  Enabled: true
+  WarnOnPartialDuplicates: false
+
+RSpecGuide/DuplicateBeforeHooks:
+  Enabled: true
+  WarnOnPartialDuplicates: false
+
+# More lenient threshold for invariants
+RSpecGuide/InvariantExamples:
+  Enabled: true
+  MinLeafContexts: 5  # Only report if in 5+ contexts
+
+# Disable strict cops
+RSpecGuide/HappyPathFirst:
+  Enabled: false
+
+FactoryBotGuide/DynamicAttributeEvaluation:
+  Enabled: true
+```
+
+### Troubleshooting
+
+#### Issue: Too many offenses in existing codebase
+
+**Solution:** Enable cops gradually:
+
+```yaml
+# Start with most important cops
+RSpecGuide/ContextSetup:
+  Enabled: true
+
+FactoryBotGuide/DynamicAttributeEvaluation:
+  Enabled: true
+
+# Disable others temporarily
+RSpecGuide/MinimumBehavioralCoverage:
+  Enabled: false
+
+RSpecGuide/DuplicateLetValues:
+  Enabled: false
+```
+
+Then enable one cop at a time, fix offenses, and move to the next.
+
+#### Issue: False positives on simple getters
+
+**Solution:** Disable cop for specific tests:
+
+```ruby
+describe '#name' do # rubocop:disable RSpecGuide/MinimumBehavioralCoverage
+  it { expect(subject.name).to eq('test') }
+end
+```
+
+#### Issue: "Duplicate let" warning but values are contextual
+
+**Solution:** This usually indicates poor test hierarchy. Refactor:
+
+```ruby
+# Before - partial duplicates (2/3 contexts)
+describe 'Converter' do
+  context 'scenario A' do
+    let(:format) { :json }
+    # ...
+  end
+  context 'scenario B' do
+    let(:format) { :json }  # Duplicate!
+    # ...
+  end
+  context 'scenario C' do
+    let(:format) { :xml }  # Different
+    # ...
+  end
+end
+
+# After - better hierarchy
+describe 'Converter' do
+  context 'with JSON format' do
+    let(:format) { :json }
+    
+    context 'scenario A' do
+      # ...
+    end
+    
+    context 'scenario B' do
+      # ...
+    end
+  end
+  
+  context 'with XML format' do
+    let(:format) { :xml }
+    
+    context 'scenario C' do
+      # ...
+    end
+  end
+end
+```
+
+### Migration Guide
+
+#### From CharacteristicsAndContexts to MinimumBehavioralCoverage
+
+The old name still works as an alias, but you should update your config:
+
+```yaml
+# Old (deprecated)
+RSpecGuide/CharacteristicsAndContexts:
+  Enabled: true
+
+# New (recommended)
+RSpecGuide/MinimumBehavioralCoverage:
+  Enabled: true
+```
+
+No code changes needed - the cop behavior is the same.
+
+#### From DynamicAttributesForTimeAndRandom to DynamicAttributeEvaluation
+
+The old name still works as an alias:
+
+```yaml
+# Old (deprecated)
+FactoryBotGuide/DynamicAttributesForTimeAndRandom:
+  Enabled: true
+
+# New (recommended)
+FactoryBotGuide/DynamicAttributeEvaluation:
+  Enabled: true
+```
+
+The new cop checks ALL method calls, not just Time/Random, providing better coverage.
 
 ## Cops
 
