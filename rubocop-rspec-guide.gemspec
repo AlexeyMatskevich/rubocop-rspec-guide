@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "A collection of custom RuboCop cops that enforce best practices from the RSpec style guide, including context structure, testing patterns, and FactoryBot usage."
   spec.homepage = "https://github.com/rspec-guide/rubocop-rspec-guide"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/rspec-guide/rubocop-rspec-guide"
