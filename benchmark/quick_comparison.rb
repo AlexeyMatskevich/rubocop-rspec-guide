@@ -33,14 +33,14 @@ config = RuboCop::Config.new({
   }
 })
 
-RuboCop::RSpec::Language.config = config['RSpec']['Language']
+RuboCop::RSpec::Language.config = config["RSpec"]["Language"]
 
 puts "Quick Performance Check (Optimized Version)"
 puts "=" * 60
 
 Benchmark.ips do |x|
   x.config(time: 2, warmup: 1)
-  
+
   [
     RuboCop::Cop::RSpecGuide::HappyPathFirst,
     RuboCop::Cop::RSpecGuide::DuplicateLetValues,
@@ -53,6 +53,6 @@ Benchmark.ips do |x|
       commissioner.investigate(source)
     end
   end
-  
+
   x.compare!
 end

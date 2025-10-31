@@ -35,7 +35,7 @@ config = RuboCop::Config.new({
   "RSpecGuide/InvariantExamples" => {"MinLeafContexts" => 3}
 })
 
-RuboCop::RSpec::Language.config = config['RSpec']['Language']
+RuboCop::RSpec::Language.config = config["RSpec"]["Language"]
 
 puts "Benchmarking InvariantExamples (optimized with local matcher)"
 puts "Expected baseline: ~1504 i/s, Previous (slow): ~854 i/s"
@@ -43,7 +43,7 @@ puts ""
 
 Benchmark.ips do |x|
   x.config(time: 2, warmup: 1)
-  
+
   x.report("InvariantExamples") do
     cop = RuboCop::Cop::RSpecGuide::InvariantExamples.new(config)
     commissioner = RuboCop::Cop::Commissioner.new([cop], [], raise_error: false)

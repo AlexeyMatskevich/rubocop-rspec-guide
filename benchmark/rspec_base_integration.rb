@@ -41,16 +41,7 @@ SAMPLE_CODE = <<~RUBY
 RUBY
 
 # Configure RuboCop
-config = RuboCop::ConfigStore.new
-config_hash = {
-  "AllCops" => { "TargetRubyVersion" => 3.0 },
-  "RSpecGuide/MinimumBehavioralCoverage" => { "Enabled" => true },
-  "RSpecGuide/HappyPathFirst" => { "Enabled" => true },
-  "RSpecGuide/ContextSetup" => { "Enabled" => true },
-  "RSpecGuide/DuplicateLetValues" => { "Enabled" => true },
-  "RSpecGuide/DuplicateBeforeHooks" => { "Enabled" => true },
-  "RSpecGuide/InvariantExamples" => { "Enabled" => true }
-}
+RuboCop::ConfigStore.new
 
 puts "=" * 80
 puts "RuboCop::Cop::RSpec::Base Integration Benchmark"
@@ -62,13 +53,13 @@ puts "\n"
 # Run benchmark
 Benchmark.ips do |x|
   x.config(time: 10, warmup: 3)
-  
+
   x.report("Process sample RSpec file") do
     runner = RuboCop::Runner.new(
-      { format: "quiet" },
+      {format: "quiet"},
       RuboCop::ConfigStore.new
     )
-    
+
     # Create a temporary file
     require "tempfile"
     file = Tempfile.new(["benchmark_spec", ".rb"])
@@ -81,6 +72,6 @@ Benchmark.ips do |x|
       file.unlink
     end
   end
-  
+
   x.compare!
 end
